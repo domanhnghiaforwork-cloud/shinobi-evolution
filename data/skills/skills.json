@@ -2,7 +2,7 @@
   "metadata": {
     "name": "Shinobi Evolution — Skill Graph (design catalog)",
     "schema_version": "1.1-design",
-    "version": "1.1.0",
+    "version": "1.1.7",
     "locale": "vi-VN",
     "last_updated": "2026-10-16",
     "origin_file": "naruto_skill_graph_v1.json",
@@ -16,8 +16,35 @@
     "source_distinction": "canon_adapted giữ khái niệm/tên đã biết, game_design là kỹ năng/biến thể do game đề xuất."
   },
   "match_config_proposal": {
-    "match_size": "18 người (6 đội x 3), có thể thử solo trong chế độ riêng",
-    "match_minutes": 42,
+    "match_size": "Hai người solo mỗi trận, mỗi người một phe; chọn vùng rồi spawn ngẫu nhiên có khoảng cách an toàn. Tăng số người và chế độ đội để sau.",
+    "player_count": 2,
+    "match_minutes": 25,
+    "target_duration_minutes": {"min": 20, "max": 25, "is_hard_timeout": false},
+    "combat_exit_seconds": 5,
+    "simultaneous_elimination_result": "draw",
+    "initial_content_scope": {
+      "clan": "Uchiha",
+      "chakra_nature": "FIRE",
+      "build_directions": ["Hỏa thuật", "Ảo thuật"],
+      "node_allowlist_status": "specify_before_M3_M4"
+    },
+    "final_zone_policy": "Thu đến khi không còn vùng an toàn; damage tăng theo cấu hình để buộc kết thúc bằng sống sót",
+    "disconnection_policy": "Actor đứng yên, vẫn chịu damage và xét Thế thân; không tự loại theo timeout; reconnect tiếp tục actor cũ",
+    "pity_participation_prototype": {
+      "status": "approved_for_initial_playtest",
+      "min_target_max_hp_damage_fraction": 0.05,
+      "contribution_window_seconds": 30,
+      "require_alive_in_participation_area_at_target_death": true
+    },
+    "pity_settlement_policy": "Chốt đúng một lần khi toàn bộ mảnh hiếm của lượt đã được nhặt hoặc hết hạn",
+    "pity_reset_policy": "Theo nhóm loot; nhận mảnh mục tiêu hoặc bảo hiểm thì về 0; đổi mục tiêu cùng nhóm cũng về 0, không chuyển miss sang nhóm khác",
+    "inventory_policy": "Tư liệu kỹ năng chung túi giới hạn ô với vật tư sinh tồn; đầy thì phần pity chờ nhận riêng, không bị cướp; đã vào túi vẫn rơi khi chết",
+    "substitution_prototype": {
+      "status": "approved_for_initial_playtest",
+      "hp_fraction_after_trigger": 0.25,
+      "stealth_duration_seconds": 3,
+      "cooldown_seconds": 60
+    },
     "hero_level_cap": 20,
     "skill_points_per_match": 12,
     "max_active_skills": 4,
@@ -39,7 +66,7 @@
       "Điểm kỹ năng"
     ],
     "fair_rng": [
-      "Pity: sau 4 lần hoàn thành cùng loại mục tiêu đảm bảo được chọn một tư liệu trong nhóm phù hợp",
+      "Pity cá nhân: tham gia hợp lệ nhưng không nhận mảnh mục tiêu, kể cả bị cướp loot, tính trượt; miss thứ tư mở chọn ngay, mảnh chọn vào thẳng túi không bị cướp; eligibility/settle/reset theo SKILL_SYSTEM",
       "Tư liệu mở quyền lựa chọn, không tự cộng 100% sát thương",
       "Không khóa toàn bộ build cơ bản sau RNG",
       "Boss/điểm nóng có 3 phút cảnh báo và nhiều lối tiếp cận"
@@ -290,7 +317,7 @@
       ],
       "source_label": "canon_adapted",
       "canonical_rank": "E",
-      "gameplay_effect": "Thoát một đòn có báo trước",
+      "gameplay_effect": "Bị động tự tiêu một cuộn trước sát thương gây chết (kể cả vòng bo) khi cooldown sẵn sàng, đặt HP theo config, xóa khống chế/hiệu ứng bất lợi đang có rồi tàng hình và bắt đầu cooldown nội tại. Cấu hình thử đã duyệt: 25% HP tối đa, 3 giây tàng hình, cooldown 60 giây. Một cuộn khởi đầu, cap hai; trong cooldown vẫn chết dù còn cuộn. Tàng hình vẫn nhận damage, gây hoặc nhận damage làm lộ thân; hiệu ứng bất lợi mới vẫn áp được ngay. Không hồi sinh sau chết.",
       "gate_id": null,
       "access": {
         "gate_state": "none",
@@ -7809,10 +7836,10 @@
     "tier_is_not_canon_rank": true
   },
   "drop_rules_proposal": {
-    "normal_mob": "chủ yếu Ryō, XP, vật tư nâng cấp",
-    "elite": "cuộn phổ thông theo thiên hướng lựa chọn, cơ chế tích mảnh",
-    "boss": "chọn 1 trong 2-3 mảnh nhánh nâng cao tương thích",
-    "world_event": "chìa khóa thức tỉnh giới hạn theo trận; báo động cho mọi đội",
-    "pity": "sau 4 mục tiêu cùng nhóm chưa nhận đủ mảnh thì cho chọn mảnh hợp build"
+    "normal_mob": "chủ yếu Ryō, XP, vật tư nâng cấp; solo: người kết liễu nhận quỹ XP/Ryō, học node vẫn cần đủ SP và Ryō",
+    "elite": "cuộn/mảnh bí thuật hiếm rơi ra đất công khai, mọi người chơi có thể tranh nhặt; nội dung pool theo loot table được duyệt",
+    "boss": "người kết liễu nhận quỹ XP/Ryō trong solo; cuộn/mảnh hiếm rơi công khai cho mọi người tranh nhặt; pity theo tham gia hợp lệ xét riêng",
+    "world_event": "chìa khóa thức tỉnh giới hạn theo trận; báo động cho mọi người chơi",
+    "pity": "tham gia hợp lệ nhưng không nhận mảnh mục tiêu cùng nhóm, kể cả bị người khác nhặt mất, tính miss; miss thứ tư mở chọn ngay trong reward đó, mảnh chọn vào thẳng túi cá nhân không bị cướp; eligibility/settle/reset theo SKILL_SYSTEM"
   }
 }

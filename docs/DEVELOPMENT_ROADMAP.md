@@ -1,46 +1,56 @@
 # DEVELOPMENT_ROADMAP.md — Lộ trình cho người mới Vibe Code
 
-**Game:** Shinobi Evolution • **Ngày:** 2026-10-16 • **Status:** `PLANNED; nothing implemented yet`.
+**Game:** Shinobi Evolution • **Phiên bản:** 2.1 • **Ngày:** 2026-10-16 • **Bản khung:** `OFFICIAL_DESIGN_BASELINE` • **Task:** `PLANNED / DEFERRED`.
 
-> Mục đích: chia game lớn thành những feature có thể chạy và kiểm được. **Antigravity code chính; Codex review chỉ đọc; người dùng duyệt và kiểm thử bằng Godot + điện thoại Android.** Kết quả chưa được thực hiện không được đánh dấu `DONE`.
+> Mục đích: chia game thành feature kiểm được, Antigravity tự code/art/test/sửa đến M8. Người dùng chỉ nghiệm thu bản chơi được ở cuối; Codex review độc lập nếu sẵn có. Kết quả tự kiểm là VERIFIED, không tự DONE.
+
+**Task cụ thể:** [TASK_BACKLOG.md](TASK_BACKLOG.md) chia từng milestone thành đầu việc có ID, phụ thuộc, đầu ra và tiêu chí nghiệm thu. Luật còn mở tra tại [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md).
 
 ## 1. Bắc đẩu của dự án (north star)
 
-- **Vision:** PvPvE sinh tồn lai MOBA, chọn gia tộc ở sảnh, build nhẫn thuật không giới hạn tuyến cố định, farm XP/Ryō/loot, săn boss, giao tranh trên bản đồ rộng.
+- **Vision — CHỐT:** PvPvE sinh tồn solo, mỗi người một phe, người cuối cùng sống sót thắng. Trọng tâm là loot, đường đi, farm quái lấy XP, phát triển build bằng XP/SP/Ryō và áp lực vòng bo; lấy cảm hứng sinh tồn từ PUBG theo định hướng người dùng. Không có cứ điểm buff hoặc hồi sinh trong solo.
 - **Visual:** 2D HD Pixel Art nhịp hành động gợi Wizard of Legend; camera top-down 3/4, Android landscape, sprite/tiles nearest-neighbor, UI touch.
 - **Tech:** Godot 4 Standard/GDScript, VS Code, Antigravity main dev, Codex code review, Git/GitHub.
 - **Design input:** 162 node/29 tree/12 synergy là catalog, **chưa phải 162 skill lập trình hoàn chỉnh**.
-- **Mốc game đích:** 18 người/6 đội 3, 42 phút, boss/ba phong ấn/Hạch Trận, skill T0–T5. Đây là tầm nhìn, **không phải scope để agent làm ngay**.
+- **Phạm vi hiện tại — CHỐT MATCH-02/03/04:** solo hai người/trận, chọn vùng rồi spawn ngẫu nhiên an toàn, thời lượng mục tiêu 20–25 phút. Một cuộn Thế thân khởi đầu/người và có rơi thêm; bị động tự tiêu cuộn trước damage gây chết, hồi HP theo config rồi tàng hình, kể cả vòng bo. Tăng số người, mode đội và trụ hồi sinh để sau. Luật chi tiết theo `GAME_DESIGN.md` / `DESIGN_DECISIONS.md`.
+- **Nội dung — CHỐT SLICE-02/03:** Uchiha + Hỏa, hai hướng Hỏa thuật/Ảo thuật. Có brief ID/handler/stat thử trước mỗi lô; không tự bật toàn bộ clan, T5, hệ thứ hai hoặc nội dung ngoài allowlist.
 
 ## 2. Trạng thái chuẩn
 
 - `PLANNED`: chưa bắt đầu, chỉ có tài liệu.
-- `READY`: đã có acceptance criteria, phụ thuộc và test plan; người dùng cho phép triển khai.
+- `READY`: đủ brief/phụ thuộc/test plan, nằm trong quyền AUTOPILOT đã giao; không cần xin phép lại từng task.
 - `IN_PROGRESS`: Antigravity đang code task cụ thể.
-- `REVIEW`: Codex đang kiểm tra diff.
-- `QA`: người dùng chạy Godot/Android để kiểm chứng.
+- `SELF_REVIEW`: Antigravity tự rà diff và bằng chứng; review độc lập nếu có, không giả Codex PASS.
+- `VERIFIED`: kiểm tra áp dụng đã chạy đạt; tự chuyển task tiếp theo.
+- `PLAYABLE_CANDIDATE`: bản chơi được cuối M8, có launcher/build/hướng dẫn/QA để người dùng nghiệm thu.
 - `DONE`: đáp ứng DoD và được người dùng chấp thuận.
-- `BLOCKED`: thiếu tài liệu/asset/thiết bị/điều kiện, không được tự đóng.
+- `BLOCKED_EXTERNAL`: thiếu công cụ/quyền/thiết bị thật; có bằng chứng, vẫn tiếp tục phần độc lập. OPEN chi tiết không tự là blocker nếu thuộc quyền agent đặc tả.
+- `DEFERRED`: hướng mở rộng để sau, chỉ đưa lại vào kế hoạch khi người dùng duyệt phạm vi mới.
 
-**Tất cả milestone dưới đây đều khởi đầu ở `PLANNED`.** Không gán thời gian hứa hẹn theo ngày/tuần khi chưa có tốc độ phát triển thực tế; các "buổi" chỉ là thứ tự học việc.
+**Các milestone trong phạm vi hai người khởi đầu ở `PLANNED`; M6B/M9/M10 mở rộng là `DEFERRED`.** Không gán thời gian hứa hẹn theo ngày/tuần khi chưa có tốc độ phát triển thực tế; các "buổi" chỉ là thứ tự học việc.
 
 ## 3. Roadmap theo cổng (gated delivery)
 
 | Cổng | Milestone | Sản phẩm test được | Phụ thuộc | Trạng thái |
 |---|---|---|---|---|
-| M0 | Dev Environment | tạo project, chạy Godot, Git checkpoint, VS Code extension | — | PLANNED |
+| M0 | Dev Environment | kiểm project hiện có, engine/build, Git và công cụ | — | PLANNED |
 | M1 | Ninja Movement | map placeholder, player, camera, WASD/8-way & collision | M0 | PLANNED |
 | M2 | Mobile Input & Pixel Art | joystick 2 ngón, HUD, sprite 4/8 hướng, APK chạy | M1 | PLANNED |
-| M3 | Core Combat | HP/Chakra, attack, dodge, hitbox, damage, 2 quái | M2 | PLANNED |
-| M4 | Skill Graph Engine | load/validate JSON, unlock T0–T2, trang bị, UI graph | M3 | PLANNED |
+| M3 | Core Combat | HP/Chakra, hitbox, damage, 2 quái, Thế thân bị động dùng cuộn | M2 | PLANNED |
+| M4 | Skill Graph Engine | validator, XP/SP/Ryō tối thiểu, unlock T0–T2, trang bị và UI | M3 | PLANNED |
 | M5 | PvE Economy & Loot | XP/Ryō/SP, elite, cuộn, pity test, farm progression | M4 | PLANNED |
-| M6 | Vertical Slice Offline | 3 clan + 3 hệ, boss, 24–36 node, 2 synergy, 1 objective | M5 | PLANNED |
-| M7 | Networking Spike | 2 client + 1 server, movement reconciliation, secure hit/loot | M6 | PLANNED |
-| M8 | Multiplayer Playtest | 6 người, lobby test, quái & boss sync, objectives | M7 | PLANNED |
-| M9 | Alpha Content & Map | 6 clan, 5 hệ, 60–80 node, 8–12 người | M8 | PLANNED |
-| M10 | Beta Target & Hardening | 10 clan, tối đa 162 node đã duyệt, 18 người, full map | M9 | PLANNED |
+| M6A | Vertical Slice Offline nhỏ | vòng lobby → farm/build/boss/zone → kết quả với tập nội dung được duyệt | M5 | PLANNED |
+| M6B | Nhánh mở rộng slice, cần duyệt riêng | tham khảo ba clan/hai synergy sau khi bản nhỏ đạt | M8 + duyệt scope mới | DEFERRED |
+| M7 | Network Integration | 2 client + 1 server, reconciliation, authority và secure loot | M6A + quyết định mạng | PLANNED |
+| M8 | Hoàn thiện solo hai người | loot/farm/vòng bo/loại người/kết quả trên Android | M7 | PLANNED |
+| M9 | Alpha mở rộng | thêm content/map hoặc số người theo phạm vi mới được duyệt | M8 + duyệt scope mới | DEFERRED |
+| M10 | Beta mở rộng | nội dung và tải được duyệt, hardening cho phát hành | M9 + duyệt scope mới | DEFERRED |
 
 **Đường tắt không khuyến nghị:** nhảy M0 → M7 hoặc triển khai Nakama trước khi có gameplay offline hấp dẫn. **Được phép** thu nhỏ/phân lại milestone nếu benchmark hoặc khả năng triển khai yêu cầu; thay đổi scope phải phê duyệt.
+
+**Kiểm rủi ro sớm trong quyền đã giao:** M3-NET-01 thử movement/một ability/HP/Thế thân bằng server Godot riêng + hai client ENet sau M3. Không cần backend dịch vụ; ghi kết quả/ADR rồi M7 tích hợp toàn vòng chơi. Không dừng xin duyệt lại TECH-01 cho lựa chọn prototype đã ghi trong AUTOPILOT.
+
+**Đường nghiệm thu hiện tại:** M0 → M1 → M2 → M3 → M4 → M5 → M6A → M7 → M8. Không cần mở rộng M6B/M9/M10 để hoàn thành bản hai người. M6B là nhánh đề xuất, chưa tự chốt số clan/node phải code.
 
 ## 4. Chi tiết các milestone và tiêu chí nghiệm thu
 
@@ -50,10 +60,10 @@
 
 **DoD:**
 
-- Godot 4 stable được tạo bằng Project Manager, `project.godot` hiện diện; mở Godot Editor không lỗi import.
-- VS Code mở cùng thư mục project; có extension GDScript, Antigravity/Codex sẵn sàng.
-- Git init và commit checkpoint **sau khi người dùng duyệt**; `.gitignore` có `.godot/` và builds, nhưng không loại asset nguồn.
-- Sáu file trong bộ tài liệu được copy đúng đường dẫn; JSON UTF-8 parse hợp lệ.
+- Kiểm project hiện có bằng executable Godot thực tế; ghi đầy đủ version/build và đối chiếu với cấu hình. Không tạo lại hoặc ghi đè project để đáp ứng checklist.
+- VS Code/Antigravity đọc đúng project; công cụ cần thiết được kiểm thực tế. Codex độc lập không là phụ thuộc để Antigravity tiếp tục.
+- Kiểm repository đang có; commit checkpoint **sau khi người dùng duyệt**; `.gitignore` có `.godot/` và builds, nhưng không loại asset nguồn.
+- Tài liệu theo README hiện diện đúng đường dẫn; JSON UTF-8 parse hợp lệ.
 - Antigravity ghi version Godot và công cụ local thực tế vào `ARCHITECTURE.md` sau khi kiểm tra; **không tự giả lập kết quả**.
 
 **Codex review:** đường dẫn, ghi đè file, binary/secrets, tài liệu mâu thuẫn, JSON chưa đủ runtime không bị hiểu nhầm.
@@ -73,7 +83,7 @@
 
 ### M2 — Android input + Pixel Art vertical look
 
-**Scope:** joystick ảo trái, một nút action phải, thao tác đa chạm, safe area, sprite nhân vật pixel tạm + tiles.
+**Scope:** joystick ảo trái, một action có thể thử và placeholder đủ bố cục HUD đích; thao tác đa chạm, safe area, sprite nhân vật pixel tạm + tiles. Nút chưa có gameplay bị vô hiệu hóa; Thế thân chỉ có indicator bị động.
 
 **DoD:**
 
@@ -86,7 +96,7 @@
 
 ### M3 — Combat nền
 
-**Scope:** HP, chakra, attack thường, 1 kỹ năng projectile, 1 kỹ năng area hoặc dash, cooldown, animation hit, quái chase cơ bản.
+**Scope:** HP, chakra, attack thường, 1 kỹ năng projectile, 1 kỹ năng area hoặc dash, cooldown, animation hit, quái chase cơ bản; Thế thân bị động dùng cuộn, không có nút kích hoạt riêng.
 
 **DoD:**
 
@@ -94,12 +104,15 @@
 - Cooldown/chakra bị kiểm trong domain, UI phản ánh dữ liệu, button spam không bypass cooldown.
 - Enemy telegraph rõ hơn ally VFX; ít nhất một status (burn/slow) test TTL.
 - Unit tests tối thiểu: trừ HP một lần, không hit team/self sai, cạn chakra từ chối cast.
+- Thế thân: một cuộn khởi đầu, cap hai; hit không gây chết không kích hoạt; lethal hit khi có cuộn/cooldown sẵn sàng tiêu một cuộn, hồi HP/tàng hình trước kill và bắt đầu cooldown. Trong cooldown hoặc hết cuộn thì lethal hit gây chết. Tàng hình vẫn nhận damage và lộ khi gây/nhận damage; kiểm vòng bo, nhặt khi đầy, event trùng và hit khác cùng tick theo SKILL_SYSTEM §10.4.
+- SOLO-SUB-08: xóa CC/hiệu ứng bất lợi đang có, hủy DOT cũ; không áp lại debuff của hit kích hoạt sau thanh tẩy. Hit/nguồn mới có thể gây effect ngay, không có miễn nhiễm ngầm.
+- SOLO-SUB-09: cấu hình thử HP về 25% max HP, stealth tối đa 3s, cooldown 60s từ kích hoạt. Kiểm mốc cooldown ngay trước/đúng/sau 60s và lộ sớm không reset timer.
 
 **Không làm:** nhiều skill hardcoded dạng 162 ID, boss, PvP.
 
 ### M4 — Skill Graph + Catalog validator
 
-**Scope:** parse `skills.json`, validator DAG và IDs, UI kỹ năng, học T0–T2 mẫu; loadout 1–2 active/Thế thân.
+**Scope:** parse `skills.json`, validator DAG và IDs, XP/SP/Ryō tối thiểu từ fixture đã duyệt trước kiểm học node, UI kỹ năng và học T0–T2 mẫu; loadout 1–2 active/Thế thân. M5 mới bổ sung nguồn farm/loot đầy đủ.
 
 **DoD:**
 
@@ -108,6 +121,9 @@
 - **Gate có `requires_implementation` bị từ chối**, không bị auto-unlock; chỉ cho các gate đã explicit-resolve trong prototype.
 - Người chơi có thể thấy vì sao skill locked, đủ/thiếu Ryō/SP; không trang bị/cast `design_only`.
 - Thao tác chọn node dùng **touch**, không phụ thuộc hover PC.
+- Kiểm BUILD-02/LOADOUT-01: node đã học không bị quên/hoàn SP trong trận; đổi preset không sửa learned state; equip chỉ ngoài combat ở mọi vị trí và không reset cooldown. COMBAT-02: cần đủ 5s không gây/nhận damage hoặc dùng đòn/skill tấn công, cả PvE/PvP; kiểm lại lúc commit.
+- BUILD-03: learn cũng chỉ ngoài combat và khi còn sống; trong combat xem cây được, mua bị từ chối không mất SP/Ryō/item. Không tự mua lại khi thoát combat.
+- Kiểm NATURE-01 cho phạm vi được enable: hai hệ thông thường; request hệ thứ ba với cuộn thường bị từ chối, chỉ xét khi có quyền sự kiện hiếm hợp lệ. Nếu chưa triển khai sự kiện thì nhánh thứ ba tiếp tục khóa.
 
 **Không làm:** tự triển khai mọi skill vì hiển thị được graph, tự phát minh gate rank/huyết kế.
 
@@ -117,22 +133,26 @@
 
 **DoD:**
 
-- XP/Ryō/spend/trade được test trên domain; quái bị giết chỉ rơi phần thưởng **một lần**.
-- Pity cùng loot group sau 4 lượt không được mảnh mục tiêu → cơ chế chọn mảnh phù hợp hoạt động nhất quán (làm rõ off-by-one trong test).
+- XP/Ryō/spend được test trên domain; quỹ theo bên kết liễu, solo trả cho người kết liễu; retry cùng event không trả thưởng lặp. Chia đội/trade không thuộc scope solo mặc định.
+- Cuộn/mảnh hiếm elite/boss rơi công khai; hai người cùng nhặt chỉ một người nhận, request lặp/reconnect không nhân vật phẩm. Người nhận XP/Ryō không độc quyền loot.
+- LOOT-04: chết rơi toàn bộ vật tư đang mang, gồm cuộn Thế thân chưa dùng; không rơi XP/SP/Ryō/node. Retry death không nhân đồ; Thế thân ngăn chết thành công không tạo loot chết.
+- PITY-02..06: đủ ngưỡng thử 5% max HP/30s cuối, sống trong vùng lúc mục tiêu chết; không nhận mục tiêu tính miss, kể cả bị cướp. Chốt khi toàn bộ mảnh hiếm lượt đó được nhặt/hết hạn; miss thứ tư chọn trong reward thứ tư. Nhận mục tiêu/bảo hiểm hoặc đổi mục tiêu cùng nhóm thì reset; không chuyển miss sang nhóm khác.
+- LOOT-03/05: tư liệu chung túi giới hạn; pity vào túi, đầy thì chờ quyền nhận riêng không bị cướp. Kiểm retry/reconnect, không nhân quyền; item đã nhận vẫn rơi khi chết. Chốt số ô/stack, radius/TTL và ledger trong brief M5.
 - Vật phẩm hiếm chỉ mở **điều kiện**, không bypass huyết kế/tier/SP/Ryō.
 - Có ít nhất **một đường skill T4 thay thế** không lệ thuộc RNG; nếu chưa triển khai T4 hoàn chỉnh thì chứng minh bằng validator/simulation.
 
-### M6 — Vertical slice playable offline
+### M6A / M6B — Vertical slice playable offline
 
-**Scope:** Uchiha/Hyūga/Nara, Hỏa/Lôi/Thổ, Thể + Phong ấn, 24–36 node được implement/approved theo tệp riêng, 2 synergy, 1 boss và 1 objective.
+**M6A:** Uchiha/Hỏa với hai hướng Hỏa thuật/Ảo thuật theo SLICE-02/03, loot/farm, một boss, bo, Thế thân và lobby → kết quả. Brief SLICE-01 xác định ID/handler/stats cụ thể. **M6B — DEFERRED:** tham khảo ba clan/24–36 node/hai synergy sau khi M8 đạt và duyệt mở rộng; không chặn M7 hai người.
 
 **DoD:**
 
 - Có thể chơi từ lobby chọn clan tới trận, farm, nâng skill, đánh boss, kết thúc trận và quay về result.
-- Mỗi clan có ≥2 hướng build hữu dụng; một build không auto thắng tất cả trường hợp trong playtest nội bộ.
+- Tập clan được duyệt có hai hướng build thử; khi mở rộng M6B, mỗi clan thêm vào cũng phải có ≥2 hướng hữu dụng. Kiểm counterplay qua tình huống và playtest, không suy cân bằng từ số node.
 - Tất cả skill đã implemented có chi phí, cooldown, telegraph, hitbox, test cơ bản.
 - `T5` hiếm ngoài slice giữ disabled, không bị mua dù catalog có tên.
 - Có dữ liệu gameplay: time to T3/T4, average Ryō/min, FPS trong fight, ít nhất 3 tình huống counterplay.
+- Mode thử có vòng bo, cuộn Thế thân bị động và chết/bị loại không hồi sinh; có kịch bản mô phỏng đối thủ để kiểm logic người cuối cùng sống sót. Bài kiểm offline không thay thế kiểm chứng PvP solo nhiều người ở M8.
 
 ### M7 — Multiplayer proof of concept
 
@@ -141,36 +161,37 @@
 **DoD:**
 
 - Hai client nhìn thấy cùng combat state; server từ chối giả mạo damage/mua T5 khi không đủ điều kiện.
-- Chịu được disconnect/reconnect theo đặc tả thử, không dupe reward.
+- Disconnect xóa input giữ, actor đứng yên/vẫn chịu damage và xét Thế thân; không tự loại theo timeout kể cả quá 60s. Reconnect cùng actor/state, không dupe reward hoặc cấp lại cuộn.
 - Có log thời gian tick/network/late input; quyết định backend dựa trên kết quả thực.
 - Đã test trên mạng không chỉ localhost ít nhất một tình huống latency mô phỏng.
 
-**Decision gate:** chọn transport, Godot dedicated server, Nakama matchmaking hay phương án khác sau khi spike. Không khóa lựa chọn do AI thích thư viện nào.
+**Quyết định triển khai:** baseline dùng server Godot riêng/ENet local theo AUTOPILOT; agent kiểm spike rồi ghi ADR/điều chỉnh kỹ thuật có bằng chứng. Nakama/matchmaking công cộng và backend dịch vụ DEFERRED, không là cổng chờ duyệt để thử hai người.
 
-### M8 — PvPvE 6 người
+### M8 — Hoàn thiện PvPvE solo hai người
 
-**Scope:** 2 đội x3 hoặc 3 đội x2 cho test; boss contested và một/tối thiểu các điểm mục tiêu; server authoritative.
-
-**DoD:**
-
-- 6 người sync quái/projectile/loot, không ăn thưởng đôi khi nhiều người đánh boss cùng lúc.
-- PvP hit registration và stun/Thế thân hoạt động dưới latency mô phỏng.
-- Mobile device stress test ghi p95 frame time, RAM, bandwidth; chỉnh budget clone/summon trước khi tăng người.
-- Trận có điều kiện thắng rõ, không bị kẹt do player disconnect.
-
-### M9 — Alpha
-
-**Scope:** 6 clan, 5 nguyên tố, 60–80 node sau triển khai; 8–12 người nếu performance cho phép; map mở rộng, 3 boss, 3 điểm phong ấn.
+**Scope:** hai người, mỗi người một phe; chọn vùng/spawn an toàn, tranh loot, farm quái/boss, vòng bo, Thế thân bị động và loại người chơi; server authoritative. Mục tiêu 20–25 phút, không hồi sinh hoặc cứ điểm buff. Hoàn thiện trải nghiệm hai người trước khi xin mở quy mô.
 
 **DoD:**
 
-- Có QA regression theo toàn bộ clan/ability active, playtest thắng bằng mục tiêu không cần giết hết.
+- Hai người sync quái/projectile/loot, không ăn thưởng đôi khi cùng đánh boss.
+- PvP hit registration, CC và Thế thân bị động trước damage gây chết hoạt động dưới latency mô phỏng; client không tự xác nhận thoát chết hoặc nhận thêm cuộn.
+- Mobile device stress test ghi p95 frame time, RAM, bandwidth theo ngưỡng được duyệt cho hai người; giới hạn entity/VFX theo số đo.
+- Trận thắng theo người sống sót cuối cùng; vòng bo/sát thương ngoài vùng sync đúng, không phân thắng thua theo mốc 25 phút. Kiểm chết đồng thời/disconnect, cuộn hết/còn, HP hồi và tàng hình đúng authority.
+- MATCH-05: kết quả chốt sau batch damage/Thế thân của tick; cả hai chết thì hòa, đảo thứ tự actor trong fixture không đổi kết quả. ZONE-02: bo cuối hết vùng an toàn, áp lực đủ kết thúc dù có hồi phục/cuộn; không tự tắt Thế thân.
+
+### M9 — Alpha mở rộng, DEFERRED
+
+**Scope tham khảo để sau:** sáu clan, năm nguyên tố, 60–80 node; map/content hoặc số người lớn hơn phải duyệt lại từ kết quả M8. Không là điều kiện nghiệm thu bản hai người.
+
+**DoD:**
+
+- Có QA regression theo toàn bộ clan/ability active và Thế thân bị động; kiểm chứng loot/farm có rủi ro, phản công và thắng theo người sống sót cuối cùng.
 - Có chống snowball/pity analytics, nhiều tuyến farm; UI mobile mở graph không cản thao tác sống còn.
 - Không P0/P1 trong cửa nghiệm thu; telemetry đủ phát hiện crash/disconnect và skill abuse.
 
-### M10 — Beta target
+### M10 — Beta mở rộng, DEFERRED
 
-**Scope:** 10 clan và mục tiêu full catalog 162 node **chỉ khi có đủ runtime/cân bằng**, 18 người mục tiêu, 42 phút, meta cosmetics/preset, rank/season nếu thật sự cần.
+**Scope tham khảo để sau:** thêm clan và node **chỉ khi có đủ runtime/cân bằng**; số người và scope phát hành cần yêu cầu mới. Mốc hai người/20–25 phút đang hiệu lực cho phiên bản hiện tại; không tự khôi phục cấu hình trận cũ hoặc đưa rank/season vào scope.
 
 **DoD:**
 
@@ -179,52 +200,27 @@
 - Có lựa chọn IP rõ ràng trước marketing/store (license hoặc thế giới tự sáng tạo). Store policy, bảo mật, quyền riêng tư và thanh toán cần đánh giá riêng khi phát hành.
 - Beta không đồng nghĩa game đã được duyệt thương mại.
 
-## 5. Công việc đầu tiên đề nghị thực hiện ngay
+## 5. Bắt đầu chế độ tự triển khai
 
-**Chỉ thực hiện M0 + M1** trước; không cố xây nguyên một game bằng một prompt. Một chu trình feature:
+Đọc [ANTIGRAVITY_AUTOPILOT](ANTIGRAVITY_AUTOPILOT.md), [ART_GENERATION_GUIDE](ART_GENERATION_GUIDE.md) và [profile prototype](../data/prototypes/solo_first_playable.json). Người dùng đã giao Antigravity tự làm/test/sửa đến M8; không dừng ở M0/M1 hoặc xin duyệt lại từng task/asset.
 
 ```text
-Người dùng tạo task (tiêu chí nghiệm thu rõ)
- → Antigravity đọc AGENTS + docs liên quan, lập plan
- → Người dùng duyệt phạm vi
- → Antigravity code + chạy kiểm tra
- → Git diff/checkpoint
- → Codex chỉ đọc diff và báo P0..P3
- → Antigravity sửa chính xác lỗi
- → Codex re-review
- → Người dùng chạy Godot/Android và duyệt
- → Commit, đổi trạng thái DONE
+Đọc trạng thái Git/checkpoint và task
+ → bổ sung brief trong quyền đã giao, ghi plan
+ → code + tạo art bằng generate_image + tự kiểm
+ → sửa lỗi, kiểm lại, self-review
+ → VERIFIED + lưu bằng chứng/checkpoint
+ → tự sang task kế tiếp
+ → M8: PLAYABLE_CANDIDATE + launcher/build/PLAY_GUIDE/QA_REPORT
+ → người dùng chơi thực tế, chấp thuận thì ACCEPTED/DONE
 ```
 
-### Prompt Task 01 cho Antigravity
+Không bắt Codex độc lập, commit hoặc người dùng chuyển diff giữa các vòng làm. Review độc lập nếu có là bổ sung, phải ghi ai thực sự review. Khi thiếu tool/thiết bị, tiếp tục phần độc lập và báo điều kiện thiếu đúng thực tế; không giả test đã chạy.
+
+Lệnh bắt đầu để gửi Antigravity:
 
 ```text
-Bạn là Main Developer dự án Shinobi Evolution. Đọc AGENTS.md,
-docs/GAME_DESIGN.md, docs/ARCHITECTURE.md và
- docs/DEVELOPMENT_ROADMAP.md.
-
-Thực hiện M1 sau khi kiểm tra M0 đã đủ: tạo game Godot 4 Standard
-có Main scene, Player CharacterBody2D, Camera2D, map placeholder
-có vật cản; di chuyển 8 hướng bằng keyboard và collision đúng.
-
-Đưa plan + file sẽ sửa trước; không tự thêm multiplayer, skill tree,
-Nakama, database, vũ trụ Naruto hay asset bên ngoài. Không tự commit.
-Chạy kiểm thử khả thi và báo cáo những gì đã test/chưa test.
-Dừng để Codex review sau khi hoàn thành.
-```
-
-### Prompt review cho Codex
-
-```text
-Bạn là reviewer độc lập. Đọc AGENTS.md + ARCHITECTURE.md
-và review chỉ các file thay đổi của M1. KHÔNG sửa file.
-
-Kiểm tra: Godot API hợp version, CharacterBody2D.move_and_slide,
-InputMap, diagonal speed, camera, collision, leak, node paths,
-scene dependencies, regression Android design, test coverage.
-
-Báo P0/P1/P2/P3 với file/vị trí/kịch bản và cách sửa nhỏ nhất.
-Kết luận PASS / NEEDS FIX / BLOCKED và danh sách smoke test.
+Đọc AGENTS.md và docs/ANTIGRAVITY_AUTOPILOT.md rồi tự triển khai liên tục đến PLAYABLE_CANDIDATE M8, dùng generate_image theo docs/ART_GENERATION_GUIDE.md; tự test, sửa lỗi, rà soát và bàn giao bản hai người chơi được thực tế để tôi nghiệm thu, không dừng xin duyệt từng task/asset.
 ```
 
 ## 6. Chuẩn quản lý công việc trong VS Code + Git
@@ -243,9 +239,9 @@ Kết luận PASS / NEEDS FIX / BLOCKED và danh sách smoke test.
 **Definition of Done:**
 
 - Antigravity bàn giao diff và test logs; Godot không lỗi blocker.
-- Codex review xong; P0/P1 resolved; các P2 được xử lý hoặc Product Owner ghi nhận có chủ đích.
-- Người dùng thử thực tế; chỉ khi đó chuyển `DONE`.
-- Tài liệu đổi nếu interface/luật thay; checkpoint Git đã tạo sau phê duyệt.
+- Self-review/test áp dụng đạt, P0/P1/P2 liên quan đã xử lý; independent review nếu sẵn có, thiếu thì ghi NOT_RUN. VERIFIED cho phép tự tiếp tục.
+- Cuối M8 có bản chơi được/QA/PLAY_GUIDE; người dùng thử thực tế và chấp thuận mới ACCEPTED/DONE.
+- Cập nhật tài liệu/manifest/checkpoint; không cần commit để tiếp tục, không tự commit/push.
 
 ## 7. Checklist chất lượng riêng cho mobile Pixel Art
 
@@ -256,7 +252,7 @@ Kết luận PASS / NEEDS FIX / BLOCKED và danh sách smoke test.
 - [ ] Enemy telegraph thấy rõ dù 3 ninja cùng tung thuật; không phụ thuộc mỗi màu.
 - [ ] Có quality `Low/Medium/High` cho VFX khi cần; camera shake/flash tắt được.
 - [ ] Mục tiêu benchmark 30 FPS máy thấp và 60 FPS máy khuyến nghị **chỉ đánh dấu đạt sau đo trên thiết bị cụ thể**.
-- [ ] RAM/CPU/battery/network khi 6 người giao tranh được ghi log sau M8.
+- [ ] RAM/CPU/battery/network trong trận hai người được ghi log ở M8.
 
 ## 8. Rủi ro chính và cách giảm
 
@@ -278,7 +274,8 @@ Kết luận PASS / NEEDS FIX / BLOCKED và danh sách smoke test.
 |---|---|---|
 | Ngay lúc bắt đầu | `skills.json`: 162 design nodes, refs hợp lệ | **đọc/tra cứu đồ thị, chưa chiến đấu** |
 | M4 | gate validator + 3–5 kỹ năng mở hợp lệ | engine unlock, trang bị thử |
-| M6 | 24–36 node đã duyệt + 8–12 ability thật được kiểm | full vertical slice |
+| M6A | 22 node kế hoạch Uchiha/Hỏa theo profile, chỉ bật ID có handler/test | slice hai hướng build trong baseline |
+| M6B | 24–36 node / ba clan tham khảo, DEFERRED | ngoài đường nghiệm thu bản đầu |
 | M9 | 60–80 implemented nodes | PvPvE alpha |
 | M10 | up to 162 approved by content rollout | chỉ nếu runtime/balance QA đã đủ |
 
@@ -289,5 +286,15 @@ Kết luận PASS / NEEDS FIX / BLOCKED và danh sách smoke test.
 | Ngày | Phiên bản | Quyết định |
 |---|---|---|
 | 2026-10-16 | 1.0 | Khởi tạo roadmap M0–M10, chống scope creep, xác định flow Antigravity/Codex, mobile-first pixel |
+| 2026-10-16 | 1.1 | Đồng bộ WIN-01/SEAL-01/REVIVE-01: thắng sinh tồn, tranh quyền kiểm soát phong ấn, cứu/mục tiêu hồi sinh; các task code vẫn PLANNED |
+| 2026-10-16 | 1.2 | Đồng bộ ZONE-01/SEAL-02/ELIM-01: vòng bo thay giới hạn cứng 42 phút, phong ấn buff tách hồi sinh, kiểm chứng loại đội trong slice và multiplayer |
+| 2026-10-16 | 1.3 | Thêm acceptance M4 cho BUILD-02/NATURE-01/LOADOUT-01: không hoàn điểm, quyền hệ thứ ba và equip ngoài combat giữ cooldown |
+| 2026-10-16 | 1.4 | Thêm acceptance M5 cho REWARD-01/LOOT-02/PITY-02: chia XP/Ryō, tranh pickup công khai và mở chọn ở lượt thứ tư; trade cần phạm vi riêng |
+| 2026-10-16 | 1.5 | Ưu tiên solo; bỏ cứ điểm buff và hồi sinh khỏi milestone chính, thêm acceptance Thế thân bị động dùng cuộn trước damage gây chết, đồng bộ pity nhận cá nhân và quỹ kết liễu |
+| 2026-10-16 | 1.6 | Bổ sung acceptance M3 cho hai cuộn tối đa, cooldown nội tại và break stealth bởi damage theo SOLO-SUB-05..07 |
+| 2026-10-16 | 1.7 | Thêm backlog task/phụ thuộc/nghiệm thu; cấp tài nguyên tối thiểu ở M4 trước học node, chia M6A/B và đề xuất spike sớm; chốt đường nghiệm thu hai người/20–25 phút, để tăng quy mô sau |
+| 2026-10-16 | 1.8 | Thêm acceptance thanh tẩy Thế thân, học node ngoài combat và rơi toàn bộ vật tư khi chết; giữ XP/SP/Ryō/node ngoài loot chết |
+| 2026-10-16 | 2.0 | Roadmap chính thức cho Uchiha/Hỏa/hai hướng build và trận hai người; đồng bộ timer/prototype/pity/túi đồ/hòa/disconnect/bo cuối, M6B/M9/M10 deferred; giữ task PLANNED |
+| 2026-10-16 | 2.1 | Quyền tự thực hiện đến M8, VERIFIED để tiếp tục, self-review/QA có bằng chứng và chỉ nghiệm thu người dùng cuối; generate_image/profile prototype thay cổng chờ duyệt từng bước |
 
 **Quy tắc cập nhật:** sau mỗi sprint/task đã nghiệm thu, đổi trạng thái và ghi ngày/commit; không biến định hướng sản phẩm thành cam kết tính năng hiện có.

@@ -1,8 +1,12 @@
 # SKILL_SYSTEM.md — Đồ thị nhẫn thuật, chakra và kết hợp
 
-**Phiên bản:** 1.0 • **Ngày:** 2026-10-16 • **Trạng thái:** `DESIGN_SPEC / NOT YET IMPLEMENTED`.
+**Phiên bản:** 2.1 • **Ngày:** 2026-10-16 • **Trạng thái:** `OFFICIAL_DESIGN_BASELINE / NOT YET IMPLEMENTED`.
+
+**Mode chính:** solo sinh tồn hai người/trận, mục tiêu 20–25 phút; Uchiha/Hỏa với hai hướng Hỏa thuật/Ảo thuật. Mỗi người một phe, chết bị loại, không hồi sinh hoặc chiếm cứ điểm buff. Farm quái hỗ trợ tiến trình XP; XP/SP/Ryō và đồ thị nhẫn thuật được giữ theo GAME_DESIGN. Thế thân là bị động dùng cuộn, đặc tả tại §10.4. Nature/clan/nhánh ngoài allowlist và synergy mở rộng chưa bật trong baseline.
 
 **Dữ liệu đi kèm:** `../data/skills/skills.json` (tính từ thư mục docs: `../data/skills/skills.json`). Dữ liệu kế thừa thiết kế `naruto_skill_graph_v1.json`: **162 node / 29 tree / 12 synergy**. Đây là **đồ thị thiết kế**, chưa phải 162 ability hoàn thiện.
+
+**Triển khai tự chủ:** tập 22 ID/preset/số liệu thử ở [profile](../data/prototypes/solo_first_playable.json), quyền chọn stat/handler và quy trình test ở [AUTOPILOT](ANTIGRAVITY_AUTOPILOT.md). Agent tự hoàn thành brief trong quyền đã giao, không xin duyệt từng chiêu. Catalog vẫn giữ design_only; trạng thái runtime hiệu lực chỉ do manifest theo ID đã có handler/test, mô tả tại ARCHITECTURE §6. Không dùng profile số liệu như runtime allowlist đã kiểm.
 
 > **Lore vs gameplay:** `source_label=canon_adapted` là khái niệm/tên có nguồn Naruto nhưng yêu cầu, sát thương và lộ trình trong trận đã được thích nghi; `source_label=game_design` là nội dung sáng tạo riêng. Không tự khẳng định kỹ năng mới xuất hiện trong nguyên tác. Việc sử dụng IP có bảo hộ cần giải quyết trước phát hành.
 
@@ -62,8 +66,9 @@ HỎA > PHONG > LÔI > THỔ > THỦY > HỎA
 
 - **Max level 20**, ngân sách **12 SP** cho một trận đủ dài. T0 được grant tự động theo chính sách mặc định (6 node gốc). Chi phí là thiết kế tham khảo; **chưa phải đủ logic combat**.
 - Cần tránh trường hợp player level đủ nhưng thiếu SP do đường tốn tài nguyên không cân đối. UI phải cho xem tổng chi phí **đường đi tới một node**.
-- Chỉ **1 ultimate** active, 4 active, 3 passive, 1 clan trait, 1 ninja tool và 1 **Thế thân riêng** (sau khi hệ loadout ra đời).
-- Có thể đặt 2 nguyên tố chính; nguyên tố thứ ba phải là sự kiện hiếm hạn chế. Gốc `FIRE_ROOT` ... `WATER_ROOT` **không có nghĩa** cùng người có thể mua cả năm theo mặc định.
+- Chỉ **1 ultimate** active, 4 active, 3 passive, 1 clan trait, 1 ninja tool và **Thế thân bị động riêng dùng cuộn**. Thế thân không có nút cast thủ công; hiển thị số cuộn và trạng thái theo §10.4.
+- **CHỐT NATURE-01:** hai hệ chakra cơ bản thông thường; hệ thứ ba chỉ qua sự kiện hiếm có điều kiện riêng. Gốc `FIRE_ROOT` ... `WATER_ROOT` **không có nghĩa** cùng người có thể mua cả năm; cuộn thông thường không tự cấp quyền hệ thứ ba. Quyền nguyên tố và gate huyết kế được kiểm độc lập. Đặc tả predicate đếm hệ/sự kiện trước khi bật runtime liên quan.
+- **CHỐT BUILD-02:** giữ node đã học trong trận, không hoàn SP hoặc quên node để lấy lại ngân sách. Đổi hướng bằng SP còn lại và các kỹ năng đã sở hữu; đổi preset không thay learned state hoặc hoàn chi phí.
 - Các node có `implementation_status=design_only` **chưa thể cast**; chỉ khi hệ runtime đã định nghĩa archetype, cost, cooldown, hit shape và animation mới đặt trạng thái triển khai tương ứng.
 
 ## 4. Hệ thống gia tộc (10 gia tộc target)
@@ -145,6 +150,8 @@ Lai `FUSE_SHADOW_TRAP` = thuật bóng + `SEAL_TRAP`. Bóng là vùng gameplay s
 - **Nhẫn cụ/trinh sát:** `BASE_TOOLWIRE`, `BASE_THROW`, `BASE_SENSOR`.
 
 T0 chứa sáu node **nhận miễn phí**, nhưng trên HUD ban đầu không nhất thiết có sáu nút riêng; chúng có thể là tutorial/action context.
+
+**BASE_SUB trong solo:** node nền tảng này mô tả cơ chế Thế thân bị động dùng cuộn; được grant node không đồng nghĩa có một kỹ năng chủ động miễn phí hay được cấp thêm cuộn ngoài một cuộn khởi đầu. Runtime binding cần theo §10.4; node vẫn design_only cho đến khi triển khai và kiểm chứng.
 
 ### 5.2 Ngũ Độn — mỗi nhóm 7 node
 
@@ -254,9 +261,9 @@ H. authority thực hiện transaction một lần, không bị race
 - `requires_all`, `requires_any`, `tier`, `id`, `tree`, `source_label` là **dữ liệu máy kiểm được**.
 - `unlock_gate` là văn bản **mô tả yêu cầu**, chưa phải executable predicate; `gate_id` ổn định để sau này gắn resolver. **Tồn tại `unlock_gate` nghĩa là không được auto-unlock**.
 - `access.gate_state=requires_implementation` nghĩa là gate chưa được cài và test; engine **phải khóa** nếu chưa resolve.
-- `implementation_status=design_only` nghĩa là chưa có combat runtime definition. Cho xem graph trong UI nhưng **không cho trang bị/cast**.
+- `implementation_status=design_only` trong catalog raw nghĩa là chưa đủ để chạy trực tiếp. Runtime loader hợp nhất manifest theo ID; chỉ khi có handler/binding/resolver được kiểm thì trạng thái hiệu lực mới implemented. Không có manifest hoặc còn design_only hiệu lực thì **không cho trang bị/cast**.
 - `combat_runtime.* = null` có chủ ý; **không điền số ngẫu nhiên để coi như cân bằng**.
-- Chỉ khi có test/approval mới bật `implemented` cho node cụ thể và map sang `ability_archetype`.
+- Chỉ khi có handler/test trong phạm vi AUTOPILOT mới bật implemented **trong manifest runtime riêng** cho ID cụ thể; không lật trạng thái toàn catalog hoặc bỏ kiểm gate. Ghi bằng chứng, ability_archetype/slot và version; raw graph giữ ổn định.
 
 ### 8.3 Định dạng rule mới khuyến nghị cho milestone unlock
 
@@ -291,13 +298,29 @@ Nara Hiden có thể cần cấu trúc `any` = `clan_is Nara` **hoặc** `mentor
 | Boss vùng | khế ước, ấn, mảnh T3/T4 | `scroll_summoning_toad` | có quyền chọn nhóm theo mode |
 | World boss / contest | chìa thức tỉnh / lõi hiếm T5 | `awakening_memory` | giới hạn và cạnh tranh rõ |
 
+**CHỐT ECON-02/REWARD-02:** giữ XP/SP/Ryō, học node cần đủ SP và Ryō. Quỹ XP/Ryō thuộc bên kết liễu; trong solo là người kết liễu. Chia đều cho thành viên đủ điều kiện là policy lưu cho mode đội tương lai. Pity theo tham gia hợp lệ được xét riêng, không đồng nhất với người nhận quỹ XP/Ryō.
+
+**CHỐT LOOT-02:** cuộn/mảnh bí thuật hiếm elite/boss rơi công khai; người chơi khác được tranh nhặt, người kết liễu không có quyền nhận riêng mặc định. Các ô "quyền chọn" trong bảng loot là thiết kế pool/nội dung cần đặc tả, không tự cấp loot riêng. **LOOT-03 là ngoại lệ đã chốt:** mảnh chọn từ pity vào thẳng túi người có quyền chọn, không rơi công khai và không bị cướp.
+
+**Nhặt vật phẩm:** authority kiểm khoảng cách/trạng thái/quyền nhặt và inventory theo policy đã duyệt; xử lý một vật phẩm cho tối đa một người khi nhiều request cùng đến. Việc nhặt được vật phẩm không cấp quyền huyết kế/tier/nguyên tố hoặc tự học node.
+
+**CHỐT LOOT-04 — vật tư khi chết solo:** chuyển toàn bộ item đang mang, kể cả cuộn Thế thân còn lại, thành loot công khai khi bị loại. Không chuyển XP/SP/Ryō, learned node hoặc quyền gate thành đồ rơi. Xóa khỏi inventory và tạo world loot là cùng một giao dịch authority, có định danh để retry không nhân đồ. Nếu Thế thân đã ngăn chết thì không chạy giao dịch rơi đồ.
+
+**CHỐT LOOT-05 — dung lượng:** cuộn/mảnh kỹ năng dùng chung túi giới hạn ô với vật tư sinh tồn. Cuộn Thế thân đồng thời chịu cap hai; không cấp ngăn tư liệu vô hạn. Số ô, stack và giới hạn pickup phải được cấu hình trong M5.
+
 **Ví dụ item ID minh họa, chưa nằm trong `skills.json`:** `scroll_fire`, `scroll_shadow_clone`, `training_seal`, `scroll_summoning_toad`, `awakening_memory`, `sage_essence`. Cần tạo `items.json` và `loot_tables.json` riêng trong milestone Loot; chưa tuyên bố runtime đã xử lý.
 
 ### 9.2 Pity và tính công bằng
 
 - Counter theo `(player_id, loot_group_id, match_id)`.
-- Sau **4 lượt hợp lệ** cùng loot group không được mảnh tương thích mục tiêu, lần nhận thưởng tiếp theo cho phép **chọn một mảnh** phù hợp group; quy tắc exact trigger phải có unit test trước khi release.
-- Pity không bảo đảm **huyết kế không tương thích** hoặc ultimate hiếm trái luật. Loot group chỉ chứa tài nguyên player có thể sử dụng hoặc chuyển đổi hợp lệ.
+- **CHỐT PITY-02:** sau ba lượt hợp lệ liên tiếp không nhận mảnh mục tiêu cùng loot group, nếu lượt thứ tư cũng trượt thì mở quyền chọn một mảnh phù hợp **trong chính reward lượt thứ tư**; không chuyển sang lượt thứ năm. Ranh giới 3/4/5 phải có fixture kiểm chứng.
+- **CHỐT PITY-03:** một người tham gia hợp lệ nhưng không nhận mảnh mục tiêu được tính trượt, kể cả mảnh bị người khác tranh nhặt. Không bắt buộc chính người đó phải nhặt được loot mới tính lượt; tập người hợp lệ theo PITY-04, xét độc lập với quỹ XP/Ryō theo kết liễu.
+- **CHỐT LOOT-03/05:** mảnh chọn pity trả thẳng vào túi cá nhân; nếu đầy, giữ quyền nhận riêng không bị cướp đến khi có chỗ, không spawn ra đất hoặc xóa item khác. Claim kiểm alive/capacity và thực hiện một lần; retry/reconnect không tạo thêm lựa chọn. Item đã giao vào túi vẫn rơi khi chết theo LOOT-04; quyền chưa giao không là item đang mang, không cho người đã bị loại nhận để chơi tiếp hoặc chuyển sang trận mới.
+- Pity không bảo đảm **huyết kế không tương thích** hoặc ultimate hiếm trái luật. Các ứng viên chọn pity phải tương thích theo policy đã duyệt; vật phẩm rơi công khai không được giả định luôn phù hợp với người tranh nhặt được. Quy tắc chuyển đổi vật phẩm không dùng được cần đặc tả riêng.
+- **PITY-04 — cấu hình thử đã duyệt:** damage thực tế cộng dồn ít nhất 5% HP tối đa mục tiêu trong 30 giây trước lúc bị hạ; còn sống trong vùng tham gia tại thời điểm đó. Chụp eligibility trên authority khi mục tiêu chết, không phụ thuộc vị trí lúc settle. Bán kính và HP tham chiếu cần cấu hình trước M5.
+- **PITY-05 — chốt lượt:** khi toàn bộ mảnh hiếm thuộc reward event đã được nhặt hoặc hết hạn trên đất; không dùng mốc 30s riêng để settle. Không có mảnh rơi thì không có item chờ, chốt ngay. Mỗi lượt settle một lần; cần thời hạn world loot hữu hạn để không chờ vô hạn.
+- **PITY-06 — reset:** theo từng nhóm loot, nhận mảnh mục tiêu hoặc phần bảo hiểm thì về 0; đổi mục tiêu trong cùng nhóm cũng về 0. Mục tiêu ghi trước lượt đánh và gắn vào reward event; không đổi ngược kết quả, không chuyển miss giữa nhóm/mục tiêu mới. Các lượt cùng nhóm có thứ tự theo authority; không cho lượt sau làm sai chuỗi miss vì nhặt nhanh hơn. Quyền nhận bảo hiểm đang chờ không được phát lại cho cùng chuỗi trượt; ledger phải lưu kết quả và trạng thái claim riêng.
+- **Chi tiết M5 phải đặc tả:** phạm vi nhóm loot/mảnh mục tiêu, world TTL, bán kính tham gia, các mốc target revision/reset, settle có thứ tự và phục hồi quyền chờ khi reconnect. Một mảnh mục tiêu đã nhận là thành công của lượt, không đợi đủ bộ mới reset; item vừa spawn chưa phải đã nhận.
 - Có đường T4 ổn định mà không phụ thuộc world boss; thay boss bằng rèn luyện cũng phải có đánh đổi.
 - **Không ghi tỷ lệ drop %** trong bản thiết kế này vì chưa đo/duyệt. Không cho Codex/Antigravity tự coi một con số đoán là canonical.
 
@@ -314,6 +337,18 @@ Nara Hiden có thể cần cấu trúc `any` = `clan_is Nara` **hoặc** `mentor
 - Nút chưa có `runtime_definition` có thể hiển thị trong đồ thị debug, **không thể gắn nút và không thể cast**.
 - `upgrade_level`: giới hạn tối đa 3 theo gợi ý, chỉ khi có cấu hình riêng và test economy.
 
+**CHỐT LOADOUT-01 — thay kỹ năng trang bị:** chỉ ngoài giao tranh, được thực hiện ở bất kỳ vị trí nào; không cần điểm huấn luyện. Cooldown giữ theo kỹ năng/actor khi thay ô, tháo rồi gắn lại hoặc chuyển sang slot khác; thao tác equip không xóa hoặc khởi tạo lại cooldown để cast sớm. Authority kiểm điều kiện trước khi áp dụng, UI hiển thị lý do từ chối.
+
+**CHỐT BUILD-03 — học node:** cũng chỉ khi còn sống và ngoài giao tranh. Trong combat được xem cây và điều kiện, nhưng `learn` bị từ chối mà không trừ SP/Ryō/item hoặc đổi learned state; không tự mua sau khi combat kết thúc. Mở panel không tạm dừng trận; khi học phải có request hợp lệ và kiểm lại trạng thái trên authority.
+
+**Phân biệt thao tác:** `learn` trả chi phí và thêm node vào tiến trình; `equip` chọn kỹ năng đã sở hữu vào slot; `cast` dùng kỹ năng. Không dùng equip/preset làm đường hoàn điểm. Quy tắc hoàn trả khi transaction mua thất bại vẫn giữ nguyên; đó không phải thao tác hoàn điểm của người chơi.
+
+**CHỐT COMBAT-02 — timer giao tranh:** ngoài combat khi đã đủ **5 giây liên tục** không gây/nhận sát thương và không thực hiện đòn/kỹ năng tấn công, áp dụng PvP lẫn PvE. Mỗi sự kiện hợp lệ đặt lại mốc gần nhất trên authority; DOT và sát thương vòng bo thực sự gây ra cũng là sát thương. Dùng kỹ năng tấn công thành công vẫn tính khi không trúng; intent bị từ chối không phải lần sử dụng. Hiệu ứng thuần hỗ trợ không tự tính là tấn công nếu chưa phát sinh sát thương. UI đọc timer từ state, không dùng thời gian mở/đóng panel để quyết định.
+
+**Hợp đồng giao dịch:** kiểm alive/combat ở thời điểm commit `learn/equip`, sau cập nhật các sự kiện combat hợp lệ của tick; không dựa vào trạng thái lúc mở panel. Kiểm mốc ngay trước/đúng/sau 5 giây, request từ panel cũ khi vừa bị đánh, DOT và vòng bo. Buff/passive/summon khi tháo vẫn phải đặc tả theo ability trước triển khai; solo không có trạng thái gục chờ cứu.
+
+**Kiểm chứng khi triển khai M4:** node đã học vẫn còn sau đổi preset; không có request hoàn điểm hợp lệ trong mode chính; đủ SP còn lại thì có thể học nhánh khác theo gate khi ngoài combat. Learn/equip trong combat hoặc sau bị loại phải từ chối không đổi state/tài nguyên; xem cây trong combat vẫn được. Ngoài combat không bị giới hạn theo điểm bản đồ; đổi ô/tháo-gắn không reset cooldown. Fixture cho hệ thứ ba phải từ chối khi chỉ có cuộn thường và cho phép xét tiếp khi có quyền sự kiện đã duyệt, vẫn kiểm gate huyết kế.
+
 ### 10.2 Field combat cần khi hiện thực hóa mỗi ability
 
 - Identity: `skill_id`, `ability_archetype`, `slot_type`, `is_ultimate`, `element_tags`.
@@ -328,7 +363,36 @@ Nara Hiden có thể cần cấu trúc `any` = `clan_is Nara` **hoặc** `mentor
 
 - Tier cao tăng sự **đa dạng cơ chế**, không nhất thiết chỉ tăng damage. 1 ultimate/từng loadout, có startup và phản khắc chế.
 - CC chain bị diminishing returns; nhãn thuật bị ép tài nguyên/visibility; Bát Môn có hậu quả; hóa lỏng có điện khắc; triệu hồi có cap entity.
-- Không cho summon chiến đấu thay player sau khi team bị loại; object pool/VFX độc lập với server hit logic.
+- Không cho summon chiến đấu thay người chơi đã bị loại trong solo; object pool/VFX độc lập với server hit logic. Luật cleanup projectile/effect cần đặc tả theo ability.
+
+### 10.4 Thế thân bị động dùng cuộn trong solo — CHỐT cơ chế
+
+- `SOLO-LIFE-01`: solo không hồi sinh. `SOLO-SUB-01`: mỗi người vào trận có một cuộn, cuộn có thể rơi để nhặt thêm.
+- `SOLO-SUB-02`: tự dùng một cuộn khi một lần sát thương sắp làm HP về 0 hoặc thấp hơn, trước khi commit trạng thái chết. Điều kiện là sát thương gây chết, không phải cờ critical hit. Không có thao tác bấm nút kích hoạt.
+- `SOLO-SUB-03`: tránh lần chết đó, đặt HP theo config rồi tàng hình để chạy thoát. `SOLO-SUB-09` duyệt cấu hình thử đầu tiên: **HP = 25% HP tối đa hiện tại**, **stealth tối đa 3 giây**, **cooldown 60 giây** từ lúc kích hoạt. Không cộng 25% lên HP cũ; nếu HP dùng số nguyên, quy tắc làm tròn phải giữ HP sau kích hoạt dương. Các số được lưu riêng là cấu hình prototype, chưa là cân bằng cuối.
+- `SOLO-SUB-04`: sát thương vòng bo gây chết cũng được kích hoạt cuộn khi còn cuộn và cooldown sẵn sàng.
+- `SOLO-SUB-05`: tối đa hai cuộn, một cuộn khởi đầu và có thể nhặt cuộn dự phòng. Pickup khi đầy phải từ chối mà không xóa vật phẩm world hoặc tăng vượt cap.
+- `SOLO-SUB-06`: cooldown nội tại bắt đầu khi bị động kích hoạt; trong cooldown, hit gây chết vẫn giết được dù còn cuộn. Cooldown thuộc actor/bị động, nhặt cuộn mới hoặc lộ thân không reset cooldown; không tự tiêu cuộn dự phòng trong cooldown.
+- `SOLO-SUB-07`: tàng hình không miễn sát thương; gây hoặc nhận damage sau kích hoạt sẽ lộ thân, kể cả nhận damage vòng bo. Chỉ đòn gây chết vừa được chặn thuộc giao dịch kích hoạt, không được áp lại để lập tức phá ẩn.
+- `SOLO-SUB-08`: xóa CC và mọi hiệu ứng bất lợi đang có khi kích hoạt, bao gồm DOT và trạng thái đánh dấu/reveal nếu chúng là effect bất lợi. Không có cửa sổ miễn CC/DOT/reveal; nguồn mới có thể áp lại ngay. Nguồn môi trường như vòng bo không biến mất do thanh tẩy.
+- `BASE_SUB` có thể dùng làm binding node nền tảng cho cơ chế này. Consume cuộn + thay HP + xóa effect bất lợi + gắn stealth/cooldown + chống ghi nhận kill nhầm phải nằm trong cùng kết quả authority, không tạo death/revive giả. Debuff của chính hit kích hoạt không được áp lại sau bước thanh tẩy; hit khác cùng tick là sự kiện mới, vẫn giải quyết bình thường.
+- Hit khác sau kích hoạt, kể cả cùng tick, dùng HP mới và cooldown đang chạy để giải quyết. Không tự thêm một cửa sổ miễn damage hoặc cho dùng cuộn thứ hai do hit tiếp theo cũng gây chết.
+- Cần đặc tả phân loại effect, damage sau shield, nguồn reveal mới và thứ tự damage event trong combat. Hiệu ứng bất lợi cũ được xóa theo SOLO-SUB-08; bộ số thử đã được duyệt tại SOLO-SUB-09. Cuộn Thế thân là vật tư sinh tồn, không tự đưa vào pity mảnh bí thuật.
+
+| Kịch bản kiểm chứng khi triển khai | Kết quả kỳ vọng |
+|---|---|
+| Spawn / nhặt cuộn dự phòng / nhặt khi đã có hai | Một cuộn lúc spawn; lên tối đa hai; đầy thì không tiêu vật phẩm world |
+| Damage không gây chết, bị động đang sẵn sàng | Không tiêu cuộn, nhận damage bình thường |
+| Lethal hit, có cuộn và cooldown sẵn sàng | Tiêu đúng một, hồi HP/tàng hình và bắt đầu cooldown trước khi phát kill |
+| Cấu hình thử SOLO-SUB-09 | HP về 25% max HP hiện tại; stealth tự hết chậm nhất sau 3s, có thể lộ sớm do damage; cooldown 60s không kết thúc theo stealth |
+| Nhận lethal hit ngay trước/đúng/sau mốc cooldown 60s | Trước mốc: chết dù còn cuộn; từ đủ 60s: được xét kích hoạt nếu còn cuộn và đang sống |
+| Lethal hit khi hết cuộn hoặc đang cooldown | Chết/bị loại; cuộn còn lại không bypass cooldown |
+| Lethal damage từ vòng bo | Kích hoạt khi đủ điều kiện; các tick sau vẫn áp dụng bình thường |
+| Gây/nhận damage sau kích hoạt | Lộ thân, cooldown tiếp tục chạy; không có miễn damage |
+| Đang bị stun/root/slow/DOT/reveal bất lợi khi kích hoạt | Xóa các effect đó; không có tick DOT cũ tiếp tục gây damage |
+| Đòn kích hoạt có kèm debuff; hit khác áp debuff ngay sau đó | Không áp lại debuff của đòn đã thanh tẩy; debuff từ hit mới vẫn có hiệu lực |
+| Nhận lại cùng hit/event ID | Không áp damage/tiêu cuộn/hồi HP lặp |
+| Nhiều hit hợp lệ khác nhau cùng tick | Hit sau xét HP mới/cooldown đã chạy; có thể giết, không tự tiêu cuộn thứ hai |
 
 ## 11. Skill UI trên mobile
 
@@ -336,7 +400,7 @@ Nara Hiden có thể cần cấu trúc `any` = `clan_is Nara` **hoặc** `mentor
 2. **Nút có thể học:** sáng; **đủ tier nhưng thiếu Ryō/SP:** vàng; **thiếu một requirement:** biểu tượng lock + lý do; **không tương thích huyết kế:** khóa vĩnh viễn trong trận; **design-only:** nhãn dev chỉ ở bản debug.
 3. Click/touch node mở bảng thông tin: role, effect description, tier, total path cost, điều kiện trước, item gate và nguồn farm, combo tạo ra, slot và counterplay.
 4. Nút `Plan Path` đánh dấu các nút tiền đề, tổng SP/Ryō và item cần; không auto-purchase tất cả.
-5. Cho phép xem đồ thị khi di chuyển nhưng chặn thao tác tiêu tiền lúc combat nguy hiểm nếu UI gây bất công; quyết định mode có thể chọn khi playtest.
+5. Cho phép xem đồ thị khi di chuyển; theo BUILD-03, chặn mua node trong combat, hiển thị timer 5 giây/lý do khóa từ authority. Mở panel không dừng trận hoặc tự mua khi hết timer.
 6. Nếu player nhận được mảnh hiếm, hiển thị **3 nhánh ứng viên hợp lệ** hoặc lý do không sử dụng được.
 
 ## 12. Tám ví dụ build và counterplay
@@ -357,6 +421,12 @@ Các build là minh họa về **hướng**, có thể không mua đủ toàn b�
 ## 13. Hợp đồng JSON `skills.json` (v1.1-design)
 
 **Top-level:** `metadata`, `match_config_proposal`, `tier_rules`, `element_tokens`, `gate_rule_templates_proposal`, `source_label_definitions`, `nodes`, `synergies`, `unlock_logic`, `drop_rules_proposal`.
+
+**Phạm vi match hiện hành:** `player_count=2`, thời lượng mục tiêu 20–25 phút. Trong `match_config_proposal`, `match_minutes=25` lưu mốc tham chiếu trên của khoảng mục tiêu, không phải thời điểm tự phân thắng thua; `target_duration_minutes` lưu đủ khoảng 20–25. Các tier gate/cost còn là proposal cần thử theo nhịp mới.
+
+`combat_exit_seconds=5` và `simultaneous_elimination_result=draw` phản ánh COMBAT-02/MATCH-05. `substitution_prototype` lưu 0.25 HP fraction / 3s stealth / 60s cooldown với nhãn `approved_for_initial_playtest`; đây không phải runtime binding, không đổi `approved_for_runtime=false` của catalog.
+
+Các trường policy bổ sung trong `match_config_proposal` phản ánh scope Uchiha/Hỏa, bo cuối, disconnect và pity đã duyệt; không thay node ID/schema hoặc làm gate tự thỏa. `pity_participation_prototype` chỉ lưu ngưỡng đóng góp thử, không phải tỷ lệ drop.
 
 **Mỗi node:**
 
@@ -438,18 +508,27 @@ Số đếm này là **invariant** khi giữ dataset v1.1; nếu cập nhật n�
 
 ## 16. Những điểm cần chốt trước khi code đại trà
 
-- Phạm vi chiêu đầu tiên cho vertical slice: **tối đa 24–36 node implemented** nhưng chú trọng 8–12 ability thật đầu tiên để thấy vui, thay vì triển khai toàn bộ node root.
+- Danh sách ID/handler cho hai hướng Uchiha/Hỏa trong brief M3/M4, tính đủ tiền đề/gate và chi phí. Mốc 24–36 node/8–12 ability thuộc M6B mở rộng `DEFERRED`, không là điều kiện của bản đầu.
 - Sát thương, cooldown, mana, range của **từng ability** và hit shape trên Pixel Art mobile.
 - Contract typed cho cổng clan/mentor/event/bloodline; dữ liệu gate text hiện **chưa executable**.
-- Cơ chế `UCH_FLAME` vs `UCH_SPACE` exclusive và tổng SP đủ cho Mangekyō trong 42 phút.
+- Cơ chế `UCH_FLAME` vs `UCH_SPACE` exclusive và tổng SP cho nhánh được bật trong mục tiêu 20–25 phút; không buộc nhánh thức tỉnh hiếm phải xuất hiện ở mọi trận hai người.
 - Trùng côn trùng, rối, phân thân và triệu hồi tính entity budgets.
-- Quy tắc chính xác pity, loot ownership/reconnect, tỷ lệ rơi và prize bias.
+- Brief M5 cho nhóm loot/mảnh cụ thể, radius/TTL, event ledger và loot table thử. Điều kiện 5%/30s, settle/reset, túi đầy chờ riêng và ranh giới lượt trượt thứ tư đã chốt tại §9.2; không tự đổi luật này khi triển khai.
 
 ### Change Log
 
 | Ngày | Phiên bản | Thay đổi |
 |---|---|---|
 | 2026-10-16 | 1.0 | Tách hệ thống skill khỏi GDD, chuẩn hóa 162 node/29 nhóm/12 synergy, chỉ ra gate chưa executable và runtime còn thiếu |
+| 2026-10-16 | 1.1 | Đồng bộ BUILD-02/NATURE-01/LOADOUT-01 được Product Owner chọn: không hoàn điểm, hai hệ thường/hệ ba sự kiện, equip ngoài combat ở mọi vị trí và giữ cooldown; catalog chưa đổi |
+| 2026-10-16 | 1.2 | Đồng bộ REWARD-01/LOOT-02/PITY-02; bỏ diễn giải pity ở lượt thứ năm, tách XP/Ryō chia đội với cuộn/mảnh hiếm công khai; catalog 1.1.1 đồng bộ mô tả |
+| 2026-10-16 | 1.3 | Scope solo sinh tồn, Thế thân bị động tiêu cuộn trước chết/hồi HP/tàng hình kể cả vòng bo; giữ XP/SP/Ryō và nguyên tắc kết liễu, pity theo tham gia hợp lệ và nhận mảnh riêng; catalog 1.1.2 đồng bộ mô tả |
+| 2026-10-16 | 1.4 | Chốt SOLO-SUB-05..07: cap hai cuộn, cooldown nội tại, tàng hình vẫn nhận damage và lộ khi gây/nhận damage; thêm bảng kiểm chứng; catalog 1.1.3 đồng bộ mô tả |
+| 2026-10-16 | 1.5 | Đồng bộ solo hai người/20–25 phút; catalog 1.1.4 đổi cấu hình match và thêm khoảng thời lượng, giữ nguyên ID/graph/cost/gate/runtime |
+| 2026-10-16 | 1.6 | Chốt rơi toàn bộ vật tư khi bị loại, thanh tẩy khi Thế thân và học node ngoài combat; bổ sung giao dịch/ca kiểm chứng, catalog 1.1.5 chỉ đổi mô tả BASE_SUB |
+| 2026-10-16 | 1.7 | Chốt timer combat 5s và cấu hình Thế thân thử 25%/3s/60s; thêm ca biên timer, PITY-04 ngưỡng thử 5%/30s và PITY-05 chốt khi loot nhặt/hết hạn; catalog 1.1.6 giữ graph/runtime khóa |
+| 2026-10-16 | 2.0 | Baseline chính thức: Uchiha/Hỏa, PITY-06 reset theo nhóm, LOOT-05 túi chung giới hạn và quyền nhận riêng khi đầy; catalog 1.1.7 giữ 162 node design_only, không đổi graph/cost/gate |
+| 2026-10-16 | 2.1 | Tự đặc tả/triển khai theo AUTOPILOT, profile 22 ID và hai preset; phân biệt catalog raw với runtime readiness manifest để không khóa nhầm toàn game hoặc mở nhầm 162 node |
 
 ## 17. Tài liệu đối chiếu lore và kỹ thuật (tham khảo)
 

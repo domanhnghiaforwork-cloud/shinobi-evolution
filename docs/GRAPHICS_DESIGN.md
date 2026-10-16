@@ -1,7 +1,8 @@
 # GRAPHICS_DESIGN.md — Thiết kế đồ họa & quy trình sản xuất asset bằng AI
 
 > **Dự án:** Shinobi Evolution (tên nội bộ)  
-> **Phiên bản:** 1.0 — 2026-10-16  
+> **Phiên bản:** 2.1 — 2026-10-16
+>
 > **Trạng thái:** `ART_DIRECTION_APPROVED_FOR_PROTOTYPE` / các thông số kích thước và ngân sách hiệu năng là **đề xuất cần thử trên điện thoại**  
 > **Phạm vi:** 2D HD Pixel Art, góc nhìn MOBA, Android landscape; quy trình làm asset dành cho **một người phát triển**.  
 > **Tài liệu liên quan:** `GAME_DESIGN.md` (luật chơi, trải nghiệm); `ARCHITECTURE.md` (Godot và đường dẫn code); `SKILL_SYSTEM.md` (nhẫn thuật); `DEVELOPMENT_ROADMAP.md` (milestone); `../AGENTS.md` (quy tắc AI).
@@ -12,34 +13,30 @@
 
 ### 1.1. Mục tiêu hình ảnh
 
-- Game hành động PvPvE survival × MOBA × RPG, **2D HD Pixel Art**, camera **top-down 3/4**; tương phản, tốc độ và độ rõ đòn đánh **lấy cảm hứng từ *Wizard of Legend***, nhưng **không sao chép asset, nhân vật, hoạt ảnh hay VFX** của trò chơi đó.
+- Game **PvPvE sinh tồn solo**, mỗi người một phe, **2D HD Pixel Art**, camera **top-down 3/4**. Loot, vòng bo và quyết định chạy/đánh cần đọc rõ; farm quái lấy XP là phần tiến trình. Tương phản và độ rõ đòn đánh lấy cảm hứng từ *Wizard of Legend*, không sao chép asset/nhân vật/hoạt ảnh/VFX.
+- Thế thân là **bị động tự tiêu cuộn trước sát thương gây chết**, hồi HP rồi tàng hình, kể cả vòng bo. HUD hiển thị số cuộn (một lúc spawn, cap hai), cooldown nội tại và trạng thái sẵn sàng. Tàng hình vẫn nhận damage và lộ khi gây/nhận damage; VFX không hàm ý miễn sát thương. Không có nút kích hoạt thủ công, trụ hồi sinh hoặc cứ điểm buff trong solo.
+- **Baseline 2.0:** hai người/trận, Uchiha + Hỏa, hai hướng Hỏa thuật/Ảo thuật. VFX thanh tẩy gỡ icon bất lợi cũ khi Thế thân kích hoạt; profile thử 25% HP/3s stealth/60s cooldown đọc từ state/config. Graph cho xem khi combat nhưng khóa mua/đổi theo timer 5s; túi đầy hiển thị pity chờ nhận riêng, không vẽ vật phẩm bảo hiểm xuống đất.
 - Địa hình rừng, sông, hang, làng và khu boss có chiều sâu như game pixel RPG; nhưng chi tiết nền phải tiết chế để người chơi đọc được đòn đánh.
 - Nhẫn thuật có nhận diện nguyên tố/gia tộc rõ; khi kỹ năng tiến hóa **hình dạng, nhịp animation và thông tin gameplay** cũng phát triển.
 - Camera là 2D nhìn chéo xuống, **không phải** camera 3D sau lưng và **không bắt buộc isometric lưới kim cương 2:1**.
 - Ưu tiên **điện thoại Android chạy ngang**, thao tác hai ngón, nhìn rõ nhân vật và telegraph dù nhiều người/quái giao tranh.
 - Là dự án **solo**, tối đa hóa tái sử dụng nhân vật gốc, animation chung, tileset, shader và VFX; không bắt đầu bằng việc vẽ hàng trăm kỹ năng.
 
-### 1.2. Bộ công cụ tối giản
+### 1.2. Bộ công cụ hiện hành
 
-| Công cụ | Vai trò | Có bắt buộc không? |
+| Công cụ | Vai trò | Bắt buộc trong baseline |
 |---|---|---|
-| **Godot 4 + GDScript** | Lắp scene, TileMapLayer, AnimatedSprite2D, UI, hiệu ứng, camera, xuất Android | **Có** |
-| **VS Code** | Quản lý project, xem source, Git diff, tài liệu | **Có** |
-| **Antigravity** | AI chính: viết generator Python, script kiểm tra asset, code import/VFX trong Godot | **Có trong workflow** |
-| **Codex** | Review độc lập, mặc định chỉ đọc: logic import, format asset, hiệu năng, không tự sửa | **Có trong workflow** |
-| **Pixelorama** | Chỉnh pixel thủ công, tổ chức layer/frame, animation, lưu nguồn `.pxo` | **Khuyên dùng** |
-| **Python 3 + Pillow** | Tạo ảnh PNG/spritesheet **theo thuật toán và cấu hình JSON** | **Có khi xây generator** |
-| **Git/GitHub** | Giữ phiên bản recipe, file `.pxo`, PNG được chấp thuận; rollback | **Có** |
-| AI tạo ảnh tham chiếu | Phác thảo concept nhân vật, địa hình, VFX nếu cần | **Tùy chọn**, không phải nguồn sprite hoàn chỉnh mặc định |
+| **Antigravity `generate_image`** | Tạo hình gốc, sprite, tile, icon và texture VFX theo reference/prompt | Có |
+| **Godot 4 Standard** | UI thật, animation, telegraph/collision, import và kiểm rendered | Có |
+| **Python/Pillow hoặc xử lý ảnh local tương đương** | Crop/pad/nearest, alpha, atlas, metadata, preview và validator | Khi cần; không thay tool tạo hình |
+| **Pixelorama** | Chỉnh tay nguồn .pxo đã có hoặc khi người dùng muốn sửa về sau | Tùy chọn; không chặn luồng tự làm |
+| **Git diff + manifest nguồn** | Giữ trace prompt/raw/revision và bảo vệ asset thủ công | Có; không tự commit/push |
 
-**Chưa cần:** Blender, Photoshop, Spine, công cụ VFX đắt tiền, phần mềm tilemap riêng, plugin Pixelorama AI tự phát triển. Chỉ bổ sung khi một nhu cầu đã được kiểm chứng.
+### 1.3. Ranh giới công cụ và quyền tự thực hiện
 
-### 1.3. Ranh giới nhiệm vụ giữa các công cụ
+Luồng chính dùng `generate_image` tích hợp trong Antigravity theo [ART_GENERATION_GUIDE](ART_GENERATION_GUIDE.md). Không tạo Python renderer vẽ ninja thay công cụ này, không yêu cầu người dùng mở Pixelorama để duyệt từng ảnh. Mẫu gọi tool, reference, alpha/grid và master prompt nằm trong guide; phải kiểm tool schema thật, không tự bịa tham số.
 
-- **Antigravity không phải họa sĩ tự động biết vẽ đẹp.** Nó giỏi sinh file code, biến thể theo quy tắc, kiểm tra kích thước/palette/frame và tích hợp vào Godot.
-- **Pixelorama không trực tiếp hiểu JSON tùy ý như lệnh tạo hình** và không chạy Python như một trình thông dịch. Generator phải tạo **PNG** (hoặc format import được khác), rồi Pixelorama nhập để sửa. Pixelorama có hỗ trợ nhập **SVG** và **OpenRaster `.ora`**, nhưng **PNG là chuẩn trung gian mặc định**.
-- **Pixelorama lưu nguồn chỉnh sửa là `.pxo`**; file dùng trong Godot là PNG/spritesheet đã xuất. Không yêu cầu Godot đọc `.pxo` như texture runtime.
-- **Codex review code, dữ liệu, pipeline và rủi ro hiệu năng**; cảm giác thẩm mỹ, tư thế diễn hoạt và độ dễ đọc cuối cùng do **bạn duyệt bằng mắt và thiết bị thật**.
+Antigravity tự kiểm structural + visual trong Godot rồi promote asset do mình tạo vào runtime theo AUTOPILOT; ghi `agent_validated`, không ghi người dùng đã duyệt. Source .pxo/asset người dùng sửa hoặc owner_locked vẫn được bảo vệ. PNG runtime không bắt buộc phải có bản .pxo; với nguồn sinh ảnh, giữ prompt + references + raw output và recipe hậu xử lý.
 
 ---
 
@@ -205,156 +202,85 @@ Tạo bộ thành phần tái sử dụng:
 
 ---
 
-## 6. Quy trình tạo asset bằng code + AI + Pixelorama
+## 6. Quy trình tạo asset bằng generate_image
 
-### 6.1. Pipeline đã chọn
-
-```text
-Bạn mô tả asset + tiêu chí chất lượng
-  ↓
-Antigravity tạo recipe JSON + Python/Pillow generator
-  ↓
-Sinh PNG / sprite sheet / metadata JSON (BẢN NHÁP)
-  ↓
-Bạn xem ở kích thước thật → nếu chưa đẹp, chỉnh recipe hoặc Pixelorama
-  ↓
-Pixelorama: sửa nét pixel, palette, pose, frame, layers → lưu .pxo
-  ↓
-Export PNG spritesheet từ Pixelorama → asset ĐÃ DUYỆT
-  ↓
-Godot: import nearest, tạo SpriteFrames / TileSet / VFX scene
-  ↓
-Antigravity kiểm tra kỹ thuật → Codex review → bạn test Android
-```
-
-**Quan trọng:** code generator tạo hình theo quy tắc, không bảo đảm tự sinh ra sprite chất lượng như artist. **AI tạo ảnh tham chiếu** dùng để tìm dáng, màu và phong cách; khi chuyển sang pixel art phải kiểm tra grid, silhouette, các frame và pivot. Không yêu cầu AI sinh ngay 8 hướng × hàng chục animation rồi đưa thẳng vào game.
-
-### 6.2. Tệp và “nguồn sự thật” cho đồ họa
-
-| Tệp | Chứa gì | Ai sửa? | Có được tự ghi đè? |
-|---|---|---|---|
-| `tools/asset_generator/recipes/*.json` | Thông số màu, kích thước, outfit, frame | Bạn phê duyệt; Antigravity đề xuất | Có qua diff/duyệt |
-| `tools/asset_generator/*.py` | Thuật toán sinh pixel, spritesheet, kiểm tra | Antigravity; Codex review | Có qua diff/duyệt |
-| `art_source/pixelorama/*.pxo` | Nguồn nghệ thuật chỉnh tay có layer/frame | **Bạn/Pixelorama** | **Không** cho generator ghi đè |
-| `art_source/references/*` | Concept, nguồn tham chiếu + license | Bạn/AI tạo ảnh hợp lệ | Không tự xóa |
-| `assets/sprites/.../*.png` | Sprite runtime đã duyệt cho Godot | Xuất từ `.pxo` hoặc generator nếu được duyệt | Không ghi đè tự động |
-| `assets/vfx/.../*.png` | Sprite/spritesheet VFX runtime | Pixelorama / generator được duyệt | Không ghi đè tự động |
-| `tools/asset_generator/output_preview/*` | PNG thử nghiệm | Generator | **Được** ghi đè, không xem là nguồn gốc nghệ thuật |
-
-**Nguồn ưu tiên:** đối với asset **đã chỉnh tay**, `.pxo` được xem là bản gốc để chỉnh sửa tiếp; PNG dưới `assets/` là bản build từ `.pxo`. Với asset **thuần sinh bằng code chưa sửa tay**, script + recipe là nguồn gốc và PNG là file build. **Không để hai nguồn cùng âm thầm quản lý một PNG.**
-
-### 6.3. Cấu trúc thư mục mở rộng đề xuất
-
-Tổ chức bổ sung, **không làm mất** các thư mục project đã có:
+### 6.1. Pipeline hiện hành
 
 ```text
-shinobi-evolution/
-├── AGENTS.md
-├── docs/
-│   ├── GAME_DESIGN.md
-│   ├── ARCHITECTURE.md
-│   ├── SKILL_SYSTEM.md
-│   ├── GRAPHICS_DESIGN.md        # FILE NÀY
-│   └── DEVELOPMENT_ROADMAP.md
-├── art_source/
-│   ├── pixelorama/              # .pxo chỉnh tay, giữ trong Git
-│   ├── references/              # reference + license.txt
-│   └── palettes/                # .gpl/.json (tùy công cụ)
-├── tools/
-│   └── asset_generator/
-│       ├── generate.py          # chỉ triển khai khi được giao task
-│       ├── validate.py          # kiểm tra asset tự động
-│       ├── recipes/
-│       └── output_preview/      # output nháp, không dùng runtime
-├── assets/
-│   ├── sprites/
-│   │   ├── characters/
-│   │   └── enemies/
-│   ├── tilesets/
-│   ├── vfx/
-│   └── ui/
-└── project.godot
+Brief asset + profile/style card
+ → điền MASTER PROMPT + JOB + negative constraints
+ → gọi generate_image tích hợp, dùng reference thật
+ → giữ output gốc + prompt/reference trong art_source/
+ → crop/pad/nearest/alpha/atlas và metadata bằng xử lý kỹ thuật
+ → structural checks + preview 1x/4x + xem animation/tiling
+ → tự sửa prompt/ref/sinh lại khi lỗi
+ → promote PNG + manifest agent_validated
+ → import Godot, chạy rendered scene, kiểm input/VFX và lưu bằng chứng
+ → tiếp tục batch/task; người dùng chơi nghiệm thu ở cuối
 ```
 
-`tools/...` là **spec cho agent**, không phải tuyên bố các script đã có sẵn. Cấu trúc `assets/` giữ tương thích với `ARCHITECTURE.md`.
+Không coi ảnh concept, ảnh đúng kích thước hoặc headless parse đạt là bằng chứng sprite/animation đạt. `generate_image` không bảo đảm grid/alpha/identity tuyệt đối; validator và xem ảnh thật là bắt buộc. Nếu không đạt, chia batch một animation/một hướng hoặc từng pose, không stretch ảnh sai vào sheet.
 
-### 6.4. Recipe JSON ví dụ (schema đề xuất, không phải format Pixelorama)
+### 6.2. Tệp và nguồn gốc
+
+| Tệp | Vai trò / quy tắc |
+|---|---|
+| `art_source/prompts/<asset_id>/<revision>.json` | Full prompt, tool schema dùng, reference paths/hash và kết quả gọi |
+| `art_source/generated/<asset_id>/<revision>/` | Output gốc; không ghi đè revision cũ |
+| `art_source/previews/` | Contact sheet, animation/tiling/alpha preview; được sinh lại |
+| `art_source/pixelorama/*.pxo` | Nguồn thủ công nếu có; không tự overwrite |
+| `assets/sprites/`, `assets/tilesets/`, `assets/vfx/`, `assets/ui/icons/` | PNG runtime do agent kiểm và promote |
+| `data/art/asset_manifest.json` | Source → runtime, layout/FPS/anchor, nơi dùng, trạng thái kiểm |
+| `tools/art_pipeline/` | Xử lý ảnh kỹ thuật và validator; không là công cụ tạo hình thay generate_image |
+
+Tạo thư mục theo batch, không coi bảng là file đã tồn tại. Asset đã sửa tay lấy .pxo làm nguồn nếu có; asset từ generate_image lấy prompt/reference/raw + hậu xử lý làm nguồn. Không có hai pipeline âm thầm overwrite cùng PNG.
+
+### 6.3. Metadata tối thiểu
 
 ```json
 {
-  "schema_version": "0.1",
-  "asset_id": "ninja_base",
-  "kind": "character",
-  "target_format": "png_rgba",
+  "asset_id": "ninja_base_run_south",
+  "revision": "v001",
+  "source_tool": "generate_image",
+  "prompt_record": "art_source/prompts/ninja_base_run_south/v001.json",
+  "raw_source": "art_source/generated/ninja_base_run_south/v001/raw.png",
+  "runtime_png": "res://assets/sprites/characters/ninja_base_run_south.png",
   "frame_size": [64, 64],
-  "directions": ["south", "west", "east", "north"],
-  "animations": {
-    "idle": { "frames": 4, "fps": 6 },
-    "run": { "frames": 6, "fps": 10 }
-  },
+  "columns": 4,
+  "rows": 1,
+  "direction": "south",
+  "animation": "run",
+  "frame_count": 4,
+  "fps": 8,
   "foot_anchor_px": [32, 55],
-  "palette_id": "shinobi_default_v1",
-  "style": "top_down_3_4_hd_pixel_art",
-  "outfit": { "base": "dark_blue", "scarf": "burnt_orange" },
-  "transparent_background": true,
-  "allow_anti_aliasing": false,
-  "output_status": "preview_only"
+  "review_status": "agent_validated",
+  "owner_accepted": false
 }
 ```
 
-**Chưa được tự suy ra các frame idle/run thật từ JSON:** Antigravity phải viết renderer/generator có thể thực hiện yêu cầu và chứng minh kết quả; nếu không thể sinh chuyển động chất lượng thì tạo placeholder với nhãn rõ ràng để bạn chỉnh trong Pixelorama.
+Ví dụ này mô tả **riêng một animation/một hướng**, không là tuyên bố asset đã được tạo hoặc kiểm. Không dùng cùng layout cho idle/run có frame count khác nhau. Hash/output actual size/mode, mirror info, provenance và check results bổ sung theo ART_GENERATION_GUIDE. Không tự ghi model/seed nếu tool không trả.
 
-### 6.5. Metadata xuất ra để Godot và validator đọc
+### 6.4. Xử lý và nguồn sửa tay tùy chọn
 
-Ví dụ `ninja_base.meta.json` (schema nội bộ dự án, **không phải** format import mặc định của Godot hay Pixelorama):
+Được crop/pad, giảm kích thước nearest-neighbor, xử lý alpha/palette có kiểm, đóng atlas và sinh preview. Không tạo pose giả hoặc thay creative image generation bằng code. Nền checkerboard được vẽ vào PNG không là alpha; cần sửa bằng tool hoặc xử lý nền đồng nhất có kiểm halo.
 
-```json
-{
-  "asset_id": "ninja_base",
-  "source_type": "pixelorama_curated",
-  "runtime_png": "res://assets/sprites/characters/ninja_base.png",
-  "frame_size": [64, 64],
-  "columns": 6,
-  "rows": 4,
-  "row_directions": ["south", "west", "east", "north"],
-  "animations": { "run": { "frames_per_direction": 6, "fps": 10 } },
-  "foot_anchor_px": [32, 55],
-  "license": "original_project_art",
-  "review_status": "approved"
-}
-```
+Pixelorama chỉ cần khi chỉnh tay về sau. Không yêu cầu cài/CLI/nguồn .pxo để Antigravity tiếp tục task. Nếu đã có .pxo, bảo vệ và dùng PNG export tương ứng; muốn thử biến thể do AI thì tạo path/revision khác, giữ nguyên nguồn người dùng.
 
-**Ghi chú:** ví dụ metadata này mô tả riêng sprite sheet `run` (6 cột × 4 hàng); animation `idle` sẽ được xuất file khác hoặc theo atlas layout được quy định rõ. Không dùng một metadata `6×4` để đọc cả idle 4 frame và run 6 frame.
-
-### 6.6. Ba hướng nhập vào Pixelorama
-
-1. **PNG/spritesheet:** ưu tiên; Pixelorama `File > Open` → chọn import spritesheet nếu nhiều frame, khai báo đúng cột/hàng; sửa rồi lưu `.pxo`.
-2. **SVG:** dùng khi AI tạo hình vector theo khối vuông; Pixelorama có thể import SVG thành raster, sau đó **kiểm xem có pixel lẻ/mờ**. Không dùng SVG làm runtime sprite mặc định.
-3. **OpenRaster `.ora`:** hữu ích nếu generator/AI xuất nhiều layer có cấu trúc; phải kiểm thử bảo toàn layer với bản Pixelorama đang sử dụng.
-
-Pixelorama có chức năng xuất PNG dạng sprite sheet và CLI trên desktop để tự động hóa xuất từ project đã lưu. Chỉ tích hợp CLI **sau** khi đã chốt quy ước layout và kiểm tra phiên bản thật. Không mở rộng ngay sang plugin AI trong Pixelorama.
-
----
-
-## 7. Quy tắc đặt tên, xuất bản và kiểm soát thay đổi
+## 7. Đặt tên, promotion và hồ sơ asset
 
 ### 7.1. Tên file
 
-- Thư mục/file dùng `snake_case` ASCII; không viết khoảng trắng, không nhúng version bằng tên quá dài.
-- Ví dụ: `ninja_base_idle_south.png`, `ninja_base_run_sheet.png`, `fire_projectile_small.png`, `forest_ground_32.png`.
-- Các key asset **không tự thay thế** `skill_id` trong `data/skills/skills.json`; lập mapping riêng nếu có nhiều VFX dùng chung.
-- Khi thay đổi pixel art đã được phê duyệt, không cập nhật source `.pxo` mà quên xuất lại PNG runtime tương ứng.
+Dùng snake_case ASCII: `ninja_base_run_south.png`, `forest_ground_01.png`, `fire_impact_small.png`, `icon_fire_ball.png`. Skill ID không thay bằng asset ID; mapping rõ trong manifest/runtime config.
 
-### 7.2. Không phá hủy asset thủ công
+### 7.2. Promotion tự động trong quyền đã giao
 
-- Generator mặc định **chỉ viết `output_preview/`**. Muốn ghi vào `assets/` phải yêu cầu promotion/export **tường minh**, tạo diff và được bạn duyệt.
-- Không tự ghi đè `.pxo`. Nếu asset có bản chỉnh tay thì **ưu tiên `.pxo`**, không chạy lại Python tạo PNG rồi ghi lên file runtime.
-- Không auto xoá asset không sử dụng trừ khi có yêu cầu và danh sách được duyệt.
-- Commit các asset được duyệt và recipe vào Git; bỏ qua file tạm lớn nếu được phân loại rõ; **không commit ảnh tham chiếu bên thứ ba không được phép lưu/phân phối**.
+Antigravity được tự promote/thay **asset do chính mình tạo trong batch hiện hành** sau structural + visual checks. Không cần người dùng duyệt từng PNG. Giữ raw/revision cũ, cập nhật metadata và chạy lại import/scene liên quan; asset owner_locked, .pxo hoặc nguồn người dùng sửa không được overwrite/xóa. Tạo variant mới nếu cần thay nguồn bị khóa.
 
-### 7.3. Mỗi asset cần có hồ sơ tối thiểu
+Không tự xóa asset ngoài task, lấy ảnh tham chiếu có quyền sử dụng rõ; không commit/push hay giả ghi approved-by-owner. Agent tự kiểm không thay human acceptance cuối.
 
-`asset_id`, loại asset, pixel size, frame layout/FPS nếu có, nguồn tác giả/giấy phép, trạng thái `preview / curated / approved / deprecated`, nơi dùng trong Godot và ghi chú ảnh hưởng hiệu năng. Hồ sơ có thể ở JSON manifest hoặc bảng quản lý do Antigravity tạo, chưa cần database.
+### 7.3. Hồ sơ tối thiểu
+
+Ghi asset_id/revision, full prompt, references/hash, đường dẫn output thật, actual pixel size/mode/alpha, frame layout/FPS/anchor, runtime path/nơi dùng và kết quả từng check. Các trạng thái: `generated`, `needs_fix`, `agent_validated`, `owner_accepted`, `deprecated`. Chỉ chuyển owner_accepted sau người dùng chơi/duyệt thật.
 
 ---
 
@@ -391,12 +317,12 @@ Validator đọc asset + metadata và trả báo cáo **PASS/FAIL**, tối thi�
 1. PNG tồn tại, kích thước đúng; `RGBA`/alpha khi cần nền trong suốt.
 2. Sprite sheet chia hết cho width/height từng frame; số cột/hàng trùng metadata.
 3. Mỗi frame nằm trong vùng canvas; `foot_anchor_px` hợp lệ.
-4. Không có file runtime được ghi đè ngoài luồng promotion được duyệt.
+4. Runtime chỉ cập nhật từ promotion có manifest/checks trong quyền AUTOPILOT; nguồn thủ công/owner_locked không bị ghi đè.
 5. Không có tên file trùng `asset_id` hoặc tham chiếu runtime tới đường dẫn không tồn tại.
 6. Đối với sprite pixel: phát hiện cảnh báo màu bán trong suốt/antialiasing không mong muốn (không đánh fail đối với hiệu ứng intentionally alpha).
-7. Manifest có license/provenance cho asset bên ngoài và trạng thái duyệt.
+7. Manifest có prompt/raw/reference/provenance và trạng thái kiểm đúng thực tế; không giả owner_accepted.
 
-Validator **không thể tự chấm được** nhân vật đẹp hay cử động tự nhiên; đó là tiêu chí xem trực quan trong Pixelorama, Godot và trên điện thoại.
+Validator **không thể tự chấm được** nhân vật đẹp hay cử động tự nhiên. Antigravity phải xem preview/scene rendered để tự sửa; người dùng nghiệm thu bằng chơi ở cuối. Pixelorama không là bước bắt buộc.
 
 ---
 
@@ -409,9 +335,9 @@ Roadmap này **phụ thuộc** milestone kỹ thuật trong `DEVELOPMENT_ROADMAP
 | **A0 — Visual baseline** | palette mẫu, 1 ninja 64×64 đứng, 1 icon, 1 tile 32×32, quy ước hướng/pivot | 10 gia tộc, 8 hướng |
 | **A1 — Movement slice** | ninja idle/run 4 hướng, bóng chân, map rừng nhỏ, tường/đá | VFX ultimate |
 | **A2 — Mobile slice** | joystick, nút đánh, HP/Chakra, camera/safe area, pixel quality test Android | HUD 100 kỹ năng |
-| **A3 — Combat slice** | attack/cast/hurt, 2 quái, 3 hiệu ứng mẫu Hỏa/Lôi/Thế thân, loot icon | 162 kỹ năng |
+| **A3 — Combat slice** | attack/cast/hurt, 2 quái, hiệu ứng mẫu Hỏa/Ảo thuật/Thế thân, loot icon | 162 kỹ năng, hệ ngoài allowlist |
 | **A4 — Skill progression** | nút cây nhẫn thuật, locked/unlocked/available, icon T0–T2, 1 nhánh có tiến hóa VFX | tất cả thức tỉnh |
-| **A5 — Vertical slice** | 3 gia tộc có nhận diện, 3 nguyên tố, 1 boss, bản đồ có khu boss/PvP | bản đồ vô tận |
+| **A5 — Vertical slice** | Uchiha/Hỏa, hai hướng Hỏa thuật/Ảo thuật, 1 boss, map loot/bo/PvP cho hai người | thêm clan/nature, bản đồ vô tận |
 | **A6 — Scale after tests** | sprite atlas, VFX quality profiles, style guide mở rộng, batching phù hợp | sản xuất đại trà trước khi stress test |
 
 ### Bộ thử nghiệm nên làm ĐẦU TIÊN
@@ -422,38 +348,36 @@ Roadmap này **phụ thuộc** milestone kỹ thuật trong `DEVELOPMENT_ROADMAP
 - `fire_projectile_small.png` — một đạn lửa rõ hướng đi, có telegraph riêng nếu là đòn khó né.
 - `skill_fire_icon_32.png` — icon 32×32 phân biệt với nền.
 
-**Cổng chấp thuận đầu tiên:** đặt ninja vào map Godot, chạy được bằng joystick trên Android; sprite không nhòe, chạy không rung, 1 hiệu ứng lửa nhìn rõ và không che màn hình. Khi đạt mới mở rộng asset generator và nhiều gia tộc.
+**Cổng tự kiểm đầu tiên:** đặt ninja vào map Godot có render, di chuyển/joystick, sprite không nhòe hoặc rung, một hiệu ứng lửa rõ mà không che màn hình. Có máy Android thì thử trực tiếp, chưa có thì ghi NOT_RUN_DEVICE và tiếp tục desktop/touch simulation/export. Không dừng để người dùng duyệt asset; không mở rộng clan ngoài baseline.
 
 ---
 
-## 10. Prompt/brief tiêu chuẩn giao Antigravity và Codex
+## 10. Prompt/brief thực hiện
 
-### 10.1. Brief cho Antigravity — tạo generator đầu tiên
+### 10.1. Giao Antigravity
 
-> Đọc `AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/GAME_DESIGN.md` mục art direction và **toàn bộ** `docs/GRAPHICS_DESIGN.md`. Chỉ triển khai **A0**: tạo script Python 3 + Pillow để sinh một sprite ninja **thiết kế gốc** kích thước 64×64 và một `recipe.json`, xuất vào `tools/asset_generator/output_preview/`. Tạo validator kiểm kích thước/alpha/pivot và lệnh chạy có thể tái lập. **Không** ghi đè `assets/`, `.pxo` hoặc file người dùng sửa. Trước khi code nêu file sẽ thêm/sửa; sau khi chạy ghi lệnh, kết quả và nơi mở file để duyệt.
+Đọc AGENTS + ANTIGRAVITY_AUTOPILOT + tài liệu này + ART_GENERATION_GUIDE. Đi từ identity master/idle/run đến scene có render, rồi tiếp tục các batch art theo task tới M8; gọi generate_image thật và giữ full prompt/reference/output. Tự xem preview, sửa lỗi, validate/promote và cập nhật manifest. Không dừng chờ duyệt A0 hoặc bắt người dùng sửa Pixelorama. Không thay công cụ tạo hình bằng Python generator.
 
-### 10.2. Brief cho Codex — review asset pipeline
+### 10.2. Checklist tự review / Codex nếu sẵn có
 
-> Review **chỉ đọc** diff của task asset generator. Kiểm tra: xử lý đường dẫn Windows/Unicode, không ghi đè asset curated, lặp lại cho kết quả ổn định (determinism), PNG RGBA/frame size, metadata và dependency Pillow, import Godot 4, rủi ro lộ license/asset bên ngoài. Ghi finding theo P0–P3 có file/dòng/kịch bản tái hiện. Không sửa code, không kết luận chất lượng mỹ thuật dựa vào validation script.
+Kiểm tool provenance, file paths/Windows Unicode, bảo vệ art thủ công, alpha/grid/frame/anchor, palette/identity/camera, runtime mapping, import Godot và rendered screenshot. Ghi ai thực sự đã xem ảnh; không kết luận chất lượng mỹ thuật từ validator. Review độc lập nếu có là bổ sung, không chặn task kế tiếp khi self-check đã đạt.
 
-### 10.3. Khi cần sản xuất asset tiếp theo
-
-Mỗi yêu cầu phải ghi tối thiểu:
+### 10.3. Brief mỗi asset
 
 ```text
-Asset ID / loại asset:
-Mục đích gameplay và tình huống xuất hiện:
-Reference hợp lệ / bảng màu:
-Canvas size / tile size:
-Hướng + animation + FPS:
-Pivot / vị trí mặt đất:
-Đầu ra cần tạo (recipe, preview PNG, .pxo, runtime PNG, metadata):
-Quality target / thiết bị thử:
-Cách nghiệm thu bằng mắt và trong Godot:
-Những file AI KHÔNG được ghi đè:
+Task / asset_id / revision:
+Gameplay purpose / nơi dùng:
+Reference image paths thật:
+Identity/style/camera/palette phải giữ:
+Logical frame size / count / directions / FPS / foot anchor:
+Alpha / tiling / padding / runtime output:
+MASTER PROMPT + JOB đã điền đủ:
+Raw output + prompt record + manifest:
+Structural + visual + rendered checks:
+Kết quả / lỗi / thay đổi prompt / task kế tiếp:
 ```
 
----
+Mẫu prompt có thể dùng trực tiếp và JOB cụ thể nằm trong [ART_GENERATION_GUIDE](ART_GENERATION_GUIDE.md). Không gọi tool khi còn biến chưa điền hoặc reference chưa tồn tại.
 
 ## 11. Decision log — những gì đã chốt và đang mở
 
@@ -461,21 +385,24 @@ Những file AI KHÔNG được ghi đè:
 |---|---|---|
 | GFX-001 | **CHỐT** | 2D HD Pixel Art, MOBA top-down 3/4, Android landscape |
 | GFX-002 | **CHỐT** | Godot 4 + GDScript, VS Code, Antigravity phát triển, Codex review chỉ đọc |
-| GFX-003 | **CHỐT** | Pipeline AI/code → PNG nháp → Pixelorama `.pxo` → PNG Godot; không overwrite art thủ công |
+| GFX-003 | **ĐÃ CẬP NHẬT 2.1** | generate_image → raw/prompt → hậu xử lý kỹ thuật → tự kiểm/promote → PNG Godot; Pixelorama tùy chọn, vẫn bảo vệ art thủ công |
 | GFX-004 | **CHỐT** | Solo-first, một ninja modular base, 4 hướng animation trước, VFX tái sử dụng |
 | GFX-005 | **PROTOTYPE TARGET** | 32×32 tiles, 64×64 ninja frame, 640×360 world reference; phải test Android |
 | GFX-006 | **PROTOTYPE TARGET** | 30/60 FPS theo phân khúc máy; không cam kết khi chưa đo |
-| GFX-007 | **CHƯA CHỐT** | Bảng màu HEX chuẩn, style của trang phục/gia tộc, font và HUD cuối cùng |
-| GFX-008 | **CHƯA CHỐT** | 4 hay 8 hướng ở bản phát hành; atlas/batching cuối cùng; mức độ glow theo thiết bị |
+| GFX-007 | **PROTOTYPE_DEFAULT** | Style card/palette khởi đầu trong ART_GENERATION_GUIDE; agent tự chọn font/HUD trong art direction và kiểm, không chờ duyệt từng asset |
+| GFX-008 | **PROTOTYPE_DEFAULT / MỞ RỘNG ĐỂ SAU** | Bản đầu bốn hướng theo ART guide, atlas/glow tự kiểm theo thiết bị; tám hướng phát hành không thuộc scope hiện tại |
 | GFX-009 | **CHỐT VỀ NGUYÊN TẮC** | Không sao chép asset của Naruto hay Wizard of Legend nếu không có quyền khai thác |
+| GFX-010 | **CHỐT** | Theo hướng solo sinh tồn: HUD cuộn Thế thân bị động; không có nút dùng Thế thân, cứ điểm buff hoặc trụ hồi sinh solo; giữ camera top-down 3/4 |
+| GFX-011 | **CHỐT THEO GAMEPLAY 2.0** | Asset bản đầu Uchiha/Hỏa cho hai người; hai hướng Hỏa thuật/Ảo thuật, thanh tẩy/stealth bị động, timer combat và pity chờ riêng; không mở rộng ba clan/ba nature trước nghiệm thu |
+| GFX-012 | **CHỐT THEO YÊU CẦU 2026-10-16** | Dùng generate_image tích hợp Antigravity và prompt chung ART_GENERATION_GUIDE; agent tự kiểm/promote, người dùng chỉ nghiệm thu khi chơi được |
 
 ### 11.1. Cách duy trì tài liệu này
 
 - `GAME_DESIGN.md` là nguồn chính cho **cảm giác chơi / rules**, `SKILL_SYSTEM.md` cho **kỹ năng / unlock**, file này cho **hình ảnh / pipeline asset**, `ARCHITECTURE.md` cho **Godot implementation**.
-- Khi Antigravity muốn sửa tiêu chuẩn pixel/pivot, asset folder hoặc shader policy, phải đề xuất diff tài liệu và được duyệt; không tự sửa im lặng.
-- Khuyên **bổ sung `docs/GRAPHICS_DESIGN.md` vào bảng tài liệu phải đọc trong `AGENTS.md` khi task liên quan sprite, UI, map, VFX, animation hoặc asset generator**. Việc cập nhật `AGENTS.md` là task riêng có duyệt; file mới này chưa tự sửa file cũ.
+- Trong AUTOPILOT, Antigravity được điều chỉnh thông số art prototype/folder trong phạm vi đã giao khi có lý do/checks và cập nhật manifest/tài liệu; không dừng xin duyệt từng ảnh. Thay art direction cốt lõi hoặc overwrite nguồn người dùng vẫn ngoài quyền tự làm.
+- `AGENTS.md` đã có mục tra cứu `GRAPHICS_DESIGN.md`; task sprite/UI/map/VFX/animation/asset generator cần đọc các phần liên quan của tài liệu này.
 - Các link kỹ thuật nên tham khảo: [Pixelorama Import](https://pixelorama.org/user_manual/Import/), [Pixelorama Save/Export](https://pixelorama.org/user_manual/save_and_export/), [Pixelorama CLI](https://pixelorama.org/user_manual/cli/), [Godot – Multiple Resolutions](https://docs.godotengine.org/en/stable/tutorials/rendering/multiple_resolutions.html).
 
 ---
 
-**Tiêu chuẩn thành công:** sau khi đọc file này, một agent phải biết **tạo asset gì, tạo ở đâu, xuất định dạng nào, không được ghi đè file nào, đưa vào Godot ra sao, cần test gì trên Android**; còn bạn có thể kiểm tra nhanh bằng mắt và duyệt từng asset trước khi đưa vào game.
+**Tiêu chuẩn thành công:** Antigravity biết tạo asset bằng generate_image, giữ nguồn/prompt, tự kiểm kỹ thuật và rendered output, đưa vào Godot rồi tiếp tục đến bản chơi được; người dùng kiểm cảm giác/độ rõ bằng chơi thực tế ở cuối. Source thủ công vẫn được bảo vệ.

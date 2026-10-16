@@ -9,3 +9,13 @@
 
 # Local temporary files
 *.tmp
+
+# Project-local tooling and Python caches
+/.tools/
+/.venv/
+__pycache__/
+
+# Local export credentials and signing material
+export_credentials.cfg
+*.keystore
+*.jks
